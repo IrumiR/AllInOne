@@ -3,6 +3,7 @@ import sofa from "../../assets/images/sofa.jpg";
 import Star from "../../assets/images/Star.png";
 import ProductAbout from "./ProductAbout";
 import Feedback from "./Feedback";
+import SidePanel from "./SidePanel";
 
 const ProductDetails = () => {
   const [tab, setTab] = useState("about");
@@ -78,7 +79,9 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          <div></div>
+          <div>
+            <SidePanel />
+          </div>
         </div>
       </div>
     </section>
