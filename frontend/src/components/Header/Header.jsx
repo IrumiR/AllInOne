@@ -10,12 +10,12 @@ const navLinks = [
     display: "Home",
   },
   {
-    path: "/serviceproviders",
-    display: "Find a Service Provider",
-  },
-  {
     path: "/services",
     display: "Services",
+  },
+  {
+    path: "/products",
+    display: "Products",
   },
   {
     path: "/contact",

@@ -6,13 +6,17 @@ import Signup from '../pages/Signup'
 import Contact from '../pages/Contact'
 import ServiceProviders from '../pages/ServiceProviders/ServiceProviders'
 import ServiceProviderDetails from '../pages/ServiceProviders/ServiceProviderDetails'
+import Products from '../pages/Products/Products'
 
 import {Routes, Route} from 'react-router-dom'
+import ProductDetails from '../pages/Products/ProductDetails'
 
 const Router = () => {
   return <Routes>
     <Route path="/" element={<Home/>}/>
     <Route path="/home" element={<Home/>}/>
+    <Route path='/products' element={<Products/>}/>
+    <Route path='/products/:id' element={<ProductDetails/>}/>
     <Route path="/serviceproviders" element={<ServiceProviders/>}/>
     <Route path="/serviceproviders/:id" element={<ServiceProviderDetails/>}/>
     <Route path="/login" element={<Login/>}/>
