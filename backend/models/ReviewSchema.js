@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import ServiceProvider from "./ServiceProviderSchema.js";
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -32,6 +33,31 @@ reviewSchema.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+reviewSchema.statics.calcAverageRatings = async function (serviceproviderId) {
+  //this points to the current review
+  const stats = await this.aggregate([
+    {
+      $match: { serviceprovider: serviceproviderId },
+    },
+    {
+      $group: {
+        _id: "$serviceprovider",
+        numOfRating: { $sum: 1 },
+        avgRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+
+  await ServiceProvider.findByIdAndUpdate(serviceproviderId, {
+    totalRating: stats[0].numOfRating,
+    averageRating: stats[0].avgRating,
+  });
+};
+
+reviewSchema.post("save", function () {
+  this.constructor.calcAverageRatings(this.serviceprovider);
 });
 
 export default mongoose.model("Review", reviewSchema);
