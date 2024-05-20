@@ -4,6 +4,8 @@ import {
   deleteUser,
   getAllUsers,
   getSingleUser,
+  getUserProfile,
+  getMyReservations
 } from "../Controllers/userController.js";
 import { authenticate, restrict } from "../auth/verifyToken.js";
 
@@ -13,5 +15,7 @@ router.get("/:id", authenticate, restrict(["customer"]), getSingleUser);
 router.get("/", authenticate, restrict(["admin"]), getAllUsers);
 router.put("/:id", authenticate, restrict(["customer"]), updateUser);
 router.delete("/:id", authenticate, restrict(["customer"]), deleteUser);
+router.get("/profile/me", authenticate, restrict(["customer"]), getUserProfile);
+router.get("/reservations/my-reservations", authenticate, restrict(["customer"]), getMyReservations);
 
 export default router;

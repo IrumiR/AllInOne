@@ -1,4 +1,5 @@
 import ServiceProvider from "../models/ServiceProviderSchema.js";
+import Booking from "../models/BookingSchema.js";
 
 export const updateServiceProvider = async (req, res) => {
   const id = req.params.id;
@@ -79,5 +80,34 @@ export const getAllServiceProviders = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({ success: false, message: "Not Found" });
+  }
+};
+
+export const getServiceProviderProfile = async (req, res) => {
+  const serviceproviderId = req.userId;
+
+  try {
+    const serviceprovider = await ServiceProvider.findById(serviceproviderId);
+
+    if (!serviceprovider) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Service Provider not found" });
+    }
+
+    const { password, ...rest } = serviceprovider._doc;
+    const reservations = await Booking.find({
+      serviceprovider: serviceproviderId,
+    });
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Profile is set",
+        data: { ...rest, reservations },
+      });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
