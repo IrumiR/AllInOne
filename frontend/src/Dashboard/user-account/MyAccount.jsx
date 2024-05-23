@@ -1,5 +1,3 @@
-import React from "react";
-import userImg from "../../assets/images/patient-avatar.png";
 import { useContext, useState } from "react";
 import { authContext } from "../../context/AuthContext";
 import MyBookings from "./MyBookings";
@@ -32,13 +30,13 @@ const MyAccount = () => {
 
         {error && !loading && <Error errMessage={error} />}
 
-        {!loading && !error && (
+        {!loading && !error && userData && (
           <div className="flex flex-col md:flex-row gap-10">
             <div className="pb-[50px] px-[30px] rounded-md flex flex-col items-center md:items-start">
               <div className="flex items-center justify-center">
                 <figure className="w-[100px] h-[100px] rounded-full border-2 border-solid border-primaryColor">
                   <img
-                    src={userImg}
+                    src={userData.photo}
                     alt=""
                     className="w-full h-full rounded-full"
                   />
@@ -47,10 +45,13 @@ const MyAccount = () => {
 
               <div className="text-center mt-4 md:text-left">
                 <h3 className="text-[18px] leading-[30px] text-headingColor font-bold">
-                  Peter Parker
+                  {userData.name}
                 </h3>
                 <p className="text-textColor text-[15px] leading-6 font-medium">
-                  example@gmail.com
+                  {userData.email}
+                </p>
+                <p className="text-textColor text-[15px] leading-6 font-medium">
+                  {userData.address}
                 </p>
               </div>
 
@@ -75,7 +76,7 @@ const MyAccount = () => {
                     tab === "bookings" &&
                     "bg-primaryColor text-white font-normal"
                   } p-2 mr-5 px-5 rounded-md text-headingColor font-semibold text-[16px]
-              leading-7 border border-solid border-primaryColor`}
+        leading-7 border border-solid border-primaryColor`}
                 >
                   My Bookings
                 </button>
@@ -85,14 +86,14 @@ const MyAccount = () => {
                     tab === "settings" &&
                     "bg-primaryColor text-white font-normal"
                   } py-2 px-5 rounded-md text-headingColor font-semibold text-[16px]
-              leading-7 border border-solid border-primaryColor`}
+        leading-7 border border-solid border-primaryColor`}
                 >
                   Profile Settings
                 </button>
               </div>
 
               {tab === "bookings" && <MyBookings />}
-              {tab === "settings" && <Profile />}
+              {tab === "settings" && <Profile user={userData} />}
             </div>
           </div>
         )}

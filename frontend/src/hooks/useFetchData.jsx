@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { token } from "../../config";
 
 const useFetchData = (url) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -20,10 +20,10 @@ const useFetchData = (url) => {
         }
 
         setData(result.data);
-        setLoading(false);
       } catch (error) {
-        setLoading(false);
         setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
