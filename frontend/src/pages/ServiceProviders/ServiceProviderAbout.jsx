@@ -1,6 +1,6 @@
 import { formatDate } from "../../utils/formatDate";
 
-const ServiceProviderAbout = () => {
+const ServiceProviderAbout = ({ name, about, qualifications, experiences }) => {
   return (
     <div>
       <div>
@@ -68,7 +68,7 @@ const ServiceProviderAbout = () => {
               {formatDate("02-10-2016")} - {formatDate("01-04-2018")}
             </span>
             <p className="text-[16px] leading-5 font-medium text-textColor">
-            Residential Construction Experience
+              Residential Construction Experience
             </p>
             <p className="text-[14px] leading-5 font-medium text-textColor">
               Rajagiriya
@@ -80,7 +80,7 @@ const ServiceProviderAbout = () => {
               {formatDate("01-15-2018")} - {formatDate("04-30-2022")}
             </span>
             <p className="text-[16px] leading-5 font-medium text-textColor">
-            Commercial Carpentry Experience
+              Commercial Carpentry Experience
             </p>
             <p className="text-[14px] leading-5 font-medium text-textColor">
               Wood Workers, Wellawatta

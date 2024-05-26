@@ -5,6 +5,7 @@ import useGetProfile from "../../hooks/useFetchData";
 import { BASE_URL } from "../../../config";
 import Tabs from "./Tabs";
 import starIcon from "../../assets/images/Star.png";
+import ServiceProviderAbout from "../../pages/ServiceProviders/ServiceProviderAbout";
 
 const Dashboard = () => {
   const { data, loading, error } = useGetProfile(
@@ -85,10 +86,16 @@ const Dashboard = () => {
                         </div>
 
                         <p className="text__para font-[15px] lg:max-w-390px leading-6">
-                        service provider bio
+                          service provider bio
                         </p>
                       </div>
                     </div>
+                    <ServiceProviderAbout
+                      name={data.name}
+                      about={data.about}
+                      qualifications={data.qualifications}
+                      experiences={data.experiences}
+                    />
                   </div>
                 )}
 
