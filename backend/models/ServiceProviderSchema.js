@@ -12,6 +12,7 @@ const ServiceProviderSchema = new mongoose.Schema({
     },
 
     //Fields for service providers only
+    specialization: { type: String },
     qualifications: {
         type: Array
     },
