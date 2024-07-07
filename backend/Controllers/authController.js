@@ -2,6 +2,7 @@ import User from "../models/UserSchema.js";
 import ServiceProvider from "../models/ServiceProviderSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { validationResult } from "express-validator";
 
 const generateToken = user => {
     return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET_KEY, {
@@ -9,97 +10,134 @@ const generateToken = user => {
     })
 }
 
+// resgiter route
 export const register = async (req, res) => {
 
-    const { email, password, name, role, photo } = req.body
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const {
+        // user info
+        firstName,
+        lastName,
+        email,
+        phone,
+        address_line_1,
+        address_line_2,
+        city,
+        district,
+        province,
+        postal_code,
+        password,
+
+        // data info
+        role,
+    } = req.body
+
 
     try {
 
-        let user = null
 
-        if (role === 'customer') {
-            user = await User.findOne({ email })
-        }
-        else if (role === 'serviceprovider') {
-            user = await ServiceProvider.findOne({ email })
-        }
+        let user = await User.findOne({ email })
+
+        // else if (role === 'service-provider') {
+        //     user = await ServiceProvider.findOne({ email })
+        // }
 
         //check whether the user exists
         if (user) {
-            return res.status(400).json({ message: 'User already exists' })
+            return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
         }
 
         //hash password
         const salt = await bcrypt.genSalt(10)
-        const hashPassword = await bcrypt.hash(password, salt)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
-        if (role === 'customer') {
-            user = new User({
-                name,
-                email,
-                password: hashPassword,
-                photo,
-                role
-            })
-        }
 
-        if (role === 'serviceprovider') {
-            user = new ServiceProvider({
-                name,
-                email,
-                password: hashPassword,
-                photo,
-                role
-            })
-        }
+        user = new User({
+            firstName,
+            lastName,
+            email,
+            phone,
+            address_line_1,
+            address_line_2,
+            city,
+            district,
+            province,
+            postal_code,
+            password: hashedPassword,
+            role
+        })
+
 
         await user.save()
 
-        res.status(200).json({ success: true, message: 'User successfully created!' })
+        const payload = {
+            user: {
+                id: user.id,
+                role: user.role,
+            },
+        };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: 360000 },
+            (err, token) => {
+                if (err) throw err;
+                res.json({ token });
+            }
+        );
+
 
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Internal Server Error' })
+        res.status(500).json({ success: false, message: error.message })
     }
 };
 
+// login
 export const login = async (req, res) => {
-
-    const { email } = req.body
-
-    try {
-
-        let user = null
-
-        const customer = await User.findOne({ email })
-        const serviceprovider = await ServiceProvider.findOne({ email })
-
-        if (customer) {
-            user = customer
-        }
-        if (serviceprovider) {
-            user = serviceprovider
-        }
-
-        //check whether the user exists or not
-        if (!user) {
-            return res.status(404).json({ message: "User not found" })
-        }
-
-        //compare password
-        const isPasswordMatch = await bcrypt.compare(req.body.password, user.password)
-
-        if (!isPasswordMatch) {
-            return res.status(400).json({ status: false, message: "Invalid credentials" })
-        }
-
-        //get token
-        const token = generateToken(user)
-
-        const { password, role, bookings, ...rest } = user._doc
-
-        res.status(200).json({ status: true, message: "Login Successful", token, data: { ...rest }, role })
-
-    } catch (error) {
-        res.status(500).json({ status: false, message: "Login failed" })
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-};
+  
+    const { email, password } = req.body;
+  
+    try {
+      let user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(400).json({ errors: [{ msg: 'Invalid Credentials' }] });
+      }
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+  
+      if (!isMatch) {
+        return res.status(400).json({ errors: [{ msg: 'Invalid Credentials' }] });
+      }
+  
+      const payload = {
+        user: {
+          id: user.id,
+          role: user.role,
+        },
+      };
+  
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: 360000 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  };

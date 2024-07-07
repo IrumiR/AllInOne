@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import ServiceProvider from "../models/ServiceProviderSchema.js";
 import User from "../models/UserSchema.js";
+import SuperAdmin from "../models/SuperAdminSchema.js"
 
 export const authenticate = async (req, res, next) => {
     //get token from headers
@@ -19,8 +20,9 @@ export const authenticate = async (req, res, next) => {
         //verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-        req.userId = decoded.id;
-        req.role = decoded.role;
+        req.userId = decoded.user.id;
+        req.role = decoded.user.role;
+        req.decoded = decoded;
 
         next();
     } catch (error) {
@@ -32,20 +34,10 @@ export const authenticate = async (req, res, next) => {
     }
 };
 
-export const restrict = roles => async (req, res, next) => {
+export const allowOnly = roles => async (req, res, next) => {
+
     const userId = req.userId
-
-    let user;
-
-    const customer = await User.findById(userId)
-    const serviceprovider = await ServiceProvider.findById(userId)
-
-    if (customer) {
-        user = customer
-    }
-    if (serviceprovider) {
-        user = serviceprovider
-    }
+    const user = await User.findById(userId);
 
     if (!roles.includes(user.role)) {
         return res.status(401).json({ success: false, message: "You`re not authorized" })

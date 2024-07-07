@@ -3,13 +3,13 @@ import {
     getAllReviews,
     createReview,
 } from "../Controllers/reviewController.js";
-import { authenticate, restrict } from "./../auth/verifyToken.js";
+import { authenticate, allowOnly } from "./../auth/verifyToken.js";
 
 const router = express.Router({ mergeParams: true });
 
 router
     .route("/")
     .get(getAllReviews)
-    .post(authenticate, restrict(["customer"]), createReview);
+    .post(authenticate, allowOnly(["customer"]), createReview);
 
 export default router;

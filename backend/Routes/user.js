@@ -7,15 +7,34 @@ import {
   getUserProfile,
   getMyReservations
 } from "../Controllers/userController.js";
-import { authenticate, restrict } from "../auth/verifyToken.js";
+import { authenticate, allowOnly } from "../auth/verifyToken.js";
 
 const router = express.Router();
 
-router.get("/:id", authenticate, restrict(["customer"]), getSingleUser);
-router.get("/", authenticate, restrict(["admin"]), getAllUsers);
-router.put("/:id", authenticate, restrict(["customer"]), updateUser);
-router.delete("/:id", authenticate, restrict(["customer"]), deleteUser);
-router.get("/profile/me", authenticate, restrict(["customer"]), getUserProfile);
-router.get("/reservations/my-reservations", authenticate, restrict(["customer"]), getMyReservations);
+
+// super admin route functions
+// get all users
+router.get("/", authenticate, allowOnly(["super-admin"]), getAllUsers);
+router.get("/:id", authenticate, allowOnly(["customer"]), getSingleUser);
+
+
+// customers routes
+
+
+// service provider routes
+
+
+// services rounts
+
+
+// shop routes
+
+
+// delivery riders routes
+
+router.put("/:id", authenticate, allowOnly(["customer"]), updateUser);
+router.delete("/:id", authenticate, allowOnly(["customer"]), deleteUser);
+router.get("/profile/me", authenticate, allowOnly(["customer"]), getUserProfile);
+router.get("/reservations/my-reservations", authenticate, allowOnly(["customer"]), getMyReservations);
 
 export default router;
