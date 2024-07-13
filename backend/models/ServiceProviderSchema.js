@@ -1,43 +1,26 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import User from './UserSchema.js';
 
 const ServiceProviderSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    name: { type: String, required: true },
-    phone: { type: Number },
-    photo: { type: String },
-    price: { type: Number },
-    role: {
-        type: String
-    },
-
-    //Fields for service providers only
-    specialization: { type: String },
-    qualifications: {
-        type: Array
-    },
-    experiences: {
-        type: Array
-    },
-
-    bio: { type: String, maxLength: 50 },
-    about: { type: String },
-    timeSlots: { type: Array },
-    reviews: [{ type: mongoose.Types.ObjectId, ref: "Review" }],
-    averageRating: {
-        type: Number,
-        default: 0,
-    },
-    totalRating: {
-        type: Number,
-        default: 0,
-    },
-    isApproved: {
-        type: String,
-        enum: ["pending", "approved", "cancelled"],
-        default: "pending",
-    },
-    bookings: [{ type: mongoose.Types.ObjectId, ref: "Booking" }],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  businessName: { type: String, required: true },
+  businessAddress: { type: String, required: true },
+  businessLogo: { type: String, required: true },
+  workingHours: { type: Map, of: String, },
+  workingAreas: { type: [String], required: true },
+  serviceCategories: { type: [String], required: true },
+  businessContactNumbers: { type: Map, of: String, required: true },
+  businessEmail: { type: String },
+  businessWebsite: { type: String },
+  overallRating: { type: Number, default: 0 },
+  status: { 
+    type: String, 
+    enum: ['approved', 'pending', 'rejected'], 
+    default: 'pending' 
+  },
+  rejectionReason: { type: String }
 });
 
-export default mongoose.model("ServiceProvider", ServiceProviderSchema);
+const ServiceProvider = mongoose.model('ServiceProvider', ServiceProviderSchema);
+
+export default ServiceProvider;
