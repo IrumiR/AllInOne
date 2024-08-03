@@ -1,0 +1,32 @@
+### website frontend
+Products listing page ✅
+Single product page ✅
+Register page
+    - Customer Register ✅
+    - Services Provoder Register
+
+About us page
+Contact Us page
+
+
+# Backend and Dashboard pages
+Admin Dashboard
+    - User managemnt
+    - Services Managemnt
+    - Products Management
+
+Services Provider Dashbaord
+    - Services Managemnt
+    - Products Managemnt
+    - Orders Managemnt
+    - Shipping/Delivery Mangement
+    - Inquery Managemnt
+    - Profile Mangement
+        - Personal/Business owner info
+        - Busniess info
+        - Reviews and Rating
+
+Customer Dashboard
+    - Order Management
+    - Booked Services Management
+    - Profile Management
