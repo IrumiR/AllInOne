@@ -1,8 +1,13 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LOCAL_STORAGE_KEYS } from "@/common/constants"
 import { decodeToken } from "react-jwt"
 import { login, getCurrentUser } from "@/services/auth.service"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
+import { setIsUserAuthenticated } from "@/store/auth.slice"
+import { useDispatch, useSelector } from "react-redux"
+import { setUser } from "@/store/user.slice"
+import { setIsLoading } from "@/store/loading.slice"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +25,8 @@ import { Label } from "@/components/ui/label"
 function LoginPage() {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,49 +35,80 @@ function LoginPage() {
   const handleLogin = async (e) => {
 
     e.preventDefault();
-    console.log(email, password);
-
     try {
-  
-      const {token} = await login(email, password);
+
+      dispatch(setIsLoading(true));
+
+      const { token } = await login(email, password);
 
       // set token to local storage
       localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, token);
 
-      console.log("token:",token);
-      
-      
       // decode token to get user info
       const decodedToken = decodeToken(token);
-      
-      console.log("decoded:",decodedToken);
-      if(decodedToken) {
 
-       const userId = decodedToken.user.id;
-       setUserId(userId);
+      // console.log("decoded:", decodedToken);
+      if (decodedToken) {
 
-      //  set user id to local storage
+        const userId = decodedToken.user.id;
+        setUserId(userId);
+
+        //  save userid, access token to local storage
         localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ID, userId);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, token);
       }
 
       // get current user by id
       const currentUser = await getCurrentUser(userId);
-      // set user authenticated(true)
-      // set user redux state
 
+      // set user is authenticated
+      dispatch(setIsUserAuthenticated(true));
+
+      // set user in redux state
+      dispatch(setUser(currentUser));
+
+      // reset the login form
       setEmail('');
       setPassword('');
 
+      // show success message
+      toast.success("You have successfully logged in!");
+
+      //  navigate to profile page
       navigate('/profile');
-      
+
+      // console.log("currentUser:", currentUser);
+
     } catch (error) {
       console.error("er: ", error);
     }
-    
-
-    
+    finally {
+      dispatch(setIsLoading(false));
+    }
 
   }
+
+
+  useEffect(() => {
+    
+    // check if user is authneticated
+    const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+
+    if (accessToken && userId) {
+
+      dispatch(setIsUserAuthenticated(true));
+      setUserId(userId);
+
+      toast.success("You are already logged in!");
+
+      // redirect to profile page
+      navigate('/profile');
+
+    }
+
+  }, []);
+
 
   return (
     <section className="mt-20">

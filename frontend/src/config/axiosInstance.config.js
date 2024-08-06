@@ -22,21 +22,21 @@ axiosClient.defaults.timeout = 45000;
 
 // axiosClient.defaults.withCredentials = true;
 
-// axiosClient.interceptors.request.use(
-//   async (config) => {
-//     try {
-//         const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-//         if (accessToken) {
-//           if (config.headers) config.headers.Authorization = `Bearer ${accessToken}`;
-//         }
-//     } catch (error) {
-//       console.error(error)
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+axiosClient.interceptors.request.use(
+  async (config) => {
+    try {
+        const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+        if (accessToken) {
+          if (config.headers) config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+    } catch (error) {
+      console.error(error)
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default axiosClient;

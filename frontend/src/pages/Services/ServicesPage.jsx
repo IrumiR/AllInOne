@@ -3,6 +3,7 @@ import { servicesData } from '@/common/displayOnlyData'
 import coverBG from '@images/cover-bg-img.jpg';
 import { fetchServices } from '@/store/services.slice';
 import { useDispatch, useSelector } from 'react-redux';
+import { setIsLoading } from '@/store/loading.slice';
 
 // components
 import ProductServiceCard from '@/components/common/ProductServiceCard'
@@ -18,20 +19,30 @@ import {
 } from "@/components/ui/pagination"
 
 
-
-
 export default function ServicesPage() {
+
 
   const { loading, data, error } = useSelector((state) => state.services)
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchServices());
+    const loadServices = async () => {
+      dispatch(setIsLoading(true));
+      dispatch(fetchServices());
+      dispatch(setIsLoading(false));
+    }
+    // dispatch(fetchServices());
+
+    loadServices();
 
   },[])
 
-  console.log("data: ", data)
+  useEffect(() => {
+    dispatch(setIsLoading(loading));
+  }), [loading]
+
+  // console.log("data: ", data)
   
 
   return (

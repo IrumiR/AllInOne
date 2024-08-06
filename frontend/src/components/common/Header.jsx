@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { headerMenuData } from "@/common/menuLinkData"
 import { Link } from "react-router-dom"
-import { buttonVariants } from "../ui/button"
+import { buttonVariants, Button } from "../ui/button"
 import logo from '../../assets/images/all-in-one-logo.png'
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "@/store/auth.slice";
+import { LOCAL_STORAGE_KEYS } from "@/common/constants";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const isUserAuthenticated = useSelector((state) => state.auth.isUserAuthenticated);
 
     const [scrollClass, setScrollClass] = useState("bg-transparent");
 
@@ -29,6 +37,16 @@ function Header() {
         };
     }, []);
 
+    const handleLogout = () => {
+
+        localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+        localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_ID);
+
+        dispatch(logout());
+
+        navigate("/");
+    }
+
     return (
         <header className={`fixed left-0 top-0 w-full z-50 ${scrollClass} transition-all`}>
             <div className="mx-auto container px-4 sm:px-6 lg:px-8">
@@ -36,7 +54,7 @@ function Header() {
                     <div className="md:flex md:items-center md:gap-12">
                         <Link className="block text-teal-600" to="/">
                             <span className="sr-only">Home</span>
-                            <img src={logo} className="w-[120px] md:w-full md:h-[70px]" alt="logo"/>
+                            <img src={logo} className="w-[120px] md:w-full md:h-[70px]" alt="logo" />
                         </Link>
                     </div>
 
@@ -54,23 +72,36 @@ function Header() {
                         </nav>
 
                         <div className="flex items-center gap-4">
-                            <div className="sm:flex sm:gap-4">
-                                <Link
-                                    className={buttonVariants({ variant: "default" })}
-                                    to="/login"
-                                >
-                                    Login
-                                </Link>
 
-                                <div className="hidden sm:flex">
-                                    <Link
-                                        className={buttonVariants({ variant: "secondary" })}
-                                        to="/register"
+                            {
+                                isUserAuthenticated ? (
+                                    <Button onClick={handleLogout}
+                                        className={buttonVariants({ variant: "default" })}
                                     >
-                                        Register
-                                    </Link>
-                                </div>
-                            </div>
+                                        Logout
+                                    </Button>
+                                ) : (
+                                    <div className="sm:flex sm:gap-4">
+                                        <Link
+                                            className={buttonVariants({ variant: "default" })}
+                                            to="/login"
+                                        >
+                                            Login
+                                        </Link>
+
+                                        <Link
+                                            className={buttonVariants({ variant: "secondary" })}
+                                            to="/register"
+                                        >
+                                            Register
+                                        </Link>
+
+
+                                    </div>
+                                )
+                            }
+
+
 
                             <div className="block md:hidden">
                                 <button className="rounded bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75">
@@ -90,7 +121,7 @@ function Header() {
                     </div>
                 </div>
             </div>
-        </header>
+        </header >
     )
 }
 

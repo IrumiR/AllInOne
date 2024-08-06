@@ -1,6 +1,6 @@
 export const userRoles = {
-    superAdmin: 'superAdmin',
-    customer: 'customer',
-    deliveryPerson: 'delivery-person',
-    serviceProvider: 'service-provider'
+    SUPER_ADMIN: 'supe-admin',
+    CUSTOMER: 'customer',
+    DELIVERY_PERSON: 'delivery-person',
+    SERVICE_PROVIDER: 'service-provider'
 }

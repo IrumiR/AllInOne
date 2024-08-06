@@ -37,7 +37,6 @@ export const register = async (req, res) => {
     role,
   } = req.body
 
-
   try {
 
 
@@ -49,7 +48,7 @@ export const register = async (req, res) => {
 
     //check whether the user exists
     if (user) {
-      return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+      return res.status(400).json({ type: 'error', message: 'User already exists' });
     }
 
     //hash password
@@ -57,7 +56,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt)
 
     // set role name
-    const roleName = userRoles[role];
+    // const roleName = userRoles[role];
 
     user = new User({
       firstName,
@@ -71,7 +70,8 @@ export const register = async (req, res) => {
       province,
       postal_code,
       password: hashedPassword,
-      roleName,
+      role,
+      // roleName,
     })
 
 
@@ -87,7 +87,7 @@ export const register = async (req, res) => {
 
     const token = generateToken(payload);
 
-    res.json({ token, userId: user.userId });
+    res.status(200).json({ type: 'sucess', message: 'User Created Successfully', data: {token: token} });
 
 
   } catch (error) {

@@ -1,6 +1,18 @@
 import { BACKEND_BASE_URL } from "@/config";
-import { httpPost } from "@/services/http.service";
+import { httpPost, httpGet } from "@/services/http.service";
 
+
+const customerRegister = async (customerData) => {
+
+  try {
+    const response = await httpPost(`${BACKEND_BASE_URL}/auth/register`, customerData);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    throw error?.response?.data;
+  }
+
+}
 
 const login = async (email, password) => {
   try {
@@ -21,7 +33,9 @@ const login = async (email, password) => {
 
 const getCurrentUser = async (id) => {
   try {
-    const response = await httpPost(`${BACKEND_BASE_URL}/users/${id}`);
+    const response = await httpGet(`${BACKEND_BASE_URL}/users/profile/me`, {
+      id: id,
+    });
     const data = response.data;
     return data;
   } catch (error) {
@@ -29,4 +43,4 @@ const getCurrentUser = async (id) => {
   }
 };
 
-export { login, getCurrentUser };
+export { login, getCurrentUser, customerRegister };
