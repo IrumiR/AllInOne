@@ -15,6 +15,11 @@ import ProductsSinglePage from "@/pages/ProductsSingle/ProductsSinglePage";
 import RegisterPage from "@/pages/Register/RegisterPage";
 import ProfilePage from "@/pages/Profile/ProfilePage";
 
+import DashboardPage from "@/pages/Dashboard/DashboardPage";
+import CustomerOrders from "@/components/Dashboard/CustomerDashboard/CustomerOrders";
+import CustomerOrderSingle from "@/components/Dashboard/CustomerDashboard/CustomerOrderSingle";
+import ServicesProviderServiceAddEdit from "@/components/Dashboard/ServicesProviderDashboard/ServicesProviderServiceAddEdit";
+
 import SucessAlert from "@/components/PlaceholderComponents/SucessAlert";
 
 const Router = () => {
@@ -32,6 +37,15 @@ const Router = () => {
       <Route path="/products-single" element={<ProductsSinglePage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/dashboard/orders" element={<CustomerOrders />} />
+      <Route path="/dashboard/orders/:id" element={<CustomerOrderSingle />} />
+      <Route path="/dashboard/products/" element={<CustomerOrders />} />
+      <Route path="/dashboard/products/:id" element={<CustomerOrders />} />
+      <Route path="/dashboard/services/" element={<ServicesProviderServiceAddEdit />} />
+      <Route path="/dashboard/services/:id" element={<ServicesProviderServiceAddEdit />} />
+
 
     {/* 404 page */}
       <Route path='*' element={<NotFound />} />
