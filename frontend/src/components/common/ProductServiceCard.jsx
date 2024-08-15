@@ -1,15 +1,83 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsUserAuthenticated } from '@/store/auth.slice';
+import { LOCAL_STORAGE_KEYS } from '@/common/constants';
+import { setIsLoading } from '@/store/loading.slice';
 
 // components
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { CrossCircledIcon } from '@radix-ui/react-icons';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { toast } from 'sonner';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+    DialogFooter,
+} from "@/components/ui/dialog"
+
 
 function ProductServiceCard(props) {
 
-    const  { classNames, title, description, price, banner, link } = props;
+    const { classNames, title, description, price, banner, link, btnText, deleteAction, id } = props;
+
+    const dispatch = useDispatch();
+    const isUserAuthenticated = useSelector((state) => state.auth.isUserAuthenticated);
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    useEffect(() => {
+        // check auth
+        const checkAuth = async () => {
+            const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            if (!accessToken) {
+                dispatch(setIsUserAuthenticated(false));
+            } else {
+                dispatch(setIsUserAuthenticated(true));
+            }
+        }
+
+        checkAuth();
+    }, [dispatch]);
+
+
+    const handleDelete = async () => {
+        dispatch(setIsLoading(true));
+        try {
+            setIsDialogOpen(true);
+            await deleteAction(id);
+            toast.success('Service deleted successfully');
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.error('Failed to delete service', error);
+        }
+        dispatch(setIsLoading(false));
+
+        window.location.reload();
+    }
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+    };
+
+    const handleOpenDialog = () => {
+        setIsDialogOpen(true);
+    }
+
 
     return (
-        <Link to={link} className={`${classNames} group relative block overflow-hidden rounded-md`}>
+        <div className={`${classNames} group relative block overflow-hidden rounded-md`}>
             <button
                 className="absolute end-4 top-4 z-10 rounded-full bg-white p-1.5 text-gray-900 transition hover:text-gray-900/75"
             >
@@ -44,16 +112,60 @@ function ProductServiceCard(props) {
 
                 <p className="mt-1.5 text-sm text-gray-700">{price}</p>
 
-                <form className="mt-4">
-                    <Button
-                        className="block w-full transition hover:scale-105"
-                    >
-                        More Details
-                    </Button>
-                </form>
+                <div className="mt-4 flex gap-2">
+                    <Link className={`${buttonVariants({ variant: "default" })} w-full transition hover:scale-105`} to={link}>
+                        {btnText || 'More Details'}
+                    </Link>
+
+                    {
+                        isUserAuthenticated && (
+
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger onClick={handleOpenDialog} className={`${buttonVariants({ variant: "destructive" })}`}>
+
+                                        <CrossCircledIcon className="h-[32px]" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Delete</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
+
+                        )
+                    }
+                </div>
             </div>
-        </Link>
+            <Dialog open={isDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="text-center">Are you absolutely sure?</DialogTitle>
+                        <DialogDescription className="text-center">This action cannot be undone.</DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-center mt-2 gap-x-3">
+                        <Button variant="destructive" onClick={handleDelete}>Yes, Delete</Button>
+                        <Button variant="secondary" onClick={handleCloseDialog}>No</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+        </div>
     )
 }
+
+// props validation
+ProductServiceCard.propTypes = {
+    classNames: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    price: PropTypes.string.isRequired,
+    banner: PropTypes.string,
+    link: PropTypes.string.isRequired,
+    btnText: PropTypes.string,
+    deleteAction: PropTypes.func,
+    id: PropTypes.string.isRequired,
+};
+
 
 export default ProductServiceCard

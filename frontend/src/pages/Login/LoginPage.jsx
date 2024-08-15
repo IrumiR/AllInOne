@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { setIsUserAuthenticated } from "@/store/auth.slice"
 import { useDispatch, useSelector } from "react-redux"
-import { setUser } from "@/store/user.slice"
+import { setUser, setUserRole } from "@/store/user.slice"
 import { setIsLoading } from "@/store/loading.slice"
 
 import { Button } from "@/components/ui/button"
@@ -51,11 +51,13 @@ function LoginPage() {
       if (decodedToken) {
 
         const userId = decodedToken.user.id;
+        const userRole = decodedToken.user.role;
         setUserId(userId);
 
         //  save userid, access token to local storage
         localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ID, userId);
         localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, token);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ROLE, userRole);
       }
 
       // get current user by id
@@ -66,6 +68,7 @@ function LoginPage() {
 
       // set user in redux state
       dispatch(setUser(currentUser));
+      dispatch(setUserRole(currentUser.role));
 
       // reset the login form
       setEmail('');
@@ -94,8 +97,9 @@ function LoginPage() {
     // check if user is authneticated
     const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+    const userRole = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ROLE);
 
-    if (accessToken && userId) {
+    if (accessToken && userId && userRole) {
 
       dispatch(setIsUserAuthenticated(true));
       setUserId(userId);

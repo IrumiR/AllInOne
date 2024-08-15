@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import coverBG from '@images/cover-bg-img.jpg';
-import { productsData } from '@/common/displayOnlyData';
+// import { productsData } from '@/common/displayOnlyData';
+import { getAllProducts  } from '@/services/products.service';
+import { setIsLoading } from '@/store/loading.slice';
+import { useDispatch } from 'react-redux';
 
 // components
 import ProductServiceCard from '@/components/common/ProductServiceCard';
@@ -15,6 +18,30 @@ import {
 } from '@/components/ui/pagination';
 
 function ProductsPage() {
+
+    const dispatch = useDispatch();
+    const [productsData, setProductsData] = useState([]);
+
+    useEffect(() => {
+
+        const fetchAllProducts = async () => {
+            dispatch(setIsLoading(true));
+            try {
+                const response = await getAllProducts();
+                setProductsData(response.data);
+                console.log(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+            dispatch(setIsLoading(false));
+        }
+
+        fetchAllProducts();
+
+        console.log('Products: ', productsData);
+
+    }, [dispatch]);
+
     return (
         <>
             <section className="mt-20 overflow-hidden relative">
@@ -32,15 +59,16 @@ function ProductsPage() {
             <section className="mt-20 space-y-4">
                 <div className='container grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 place-content-between gap-x-2 gap-y-8 px-2 md:px-0 lg:px-8'>
                     {
-                        productsData.map((product) => (
+                        productsData?.map((product) => (
                             <ProductServiceCard
-                                key={product.id}
+                                key={product._id}
+                                id={product._id}
                                 classNames=""
                                 title={product.name}
                                 description={product.description}
-                                price={product.price}
+                                price={product.price.toString()}
                                 banner={product.image}
-                                link={'/products-single'}
+                                link={`/products/${product._id}`}
                             />
                         ))
                     }

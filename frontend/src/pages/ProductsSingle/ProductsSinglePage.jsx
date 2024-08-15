@@ -1,14 +1,25 @@
-import { useState } from "react"
+import { useEffect, useStat, useState } from "react"
+import { useParams } from "react-router"
+
+import { useDispatch } from 'react-redux';
+import { setIsLoading } from '@/store/loading.slice';
+import { getProductById } from '@/services/products.service';
+import { LOCAL_STORAGE_KEYS } from "@/common/constants";
+
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { MinusIcon, PlusIcon, Heart } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import ReviewForm from '@/components/ReviewForm/ReviewForm'
+import { toast } from 'sonner';
 
 function ProductsSinglePage() {
 
-    const [quantity, setQuantity] = useState(1)
+    const [quantity, setQuantity] = useState(1);
+    const dispatch = useDispatch();
+    const { id } = useParams();
+    const [product, setProduct] = useState(null);
 
     const increaseQuantity = () => {
         setQuantity(quantity + 1)
@@ -18,6 +29,45 @@ function ProductsSinglePage() {
         if (quantity === 1) return
         setQuantity(quantity - 1)
     }
+
+    // add to cart
+    const addToCart = () => {
+        const cart = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.CART)) || [];
+        const existingProduct = cart.find(item => item._id === product._id);
+
+        if (existingProduct) {
+            existingProduct.quantity += quantity;
+            existingProduct.totalPrice = existingProduct.price * existingProduct.quantity;
+        } else {
+            cart.push({ ...product, quantity: quantity, totalPrice: product.price * quantity });
+        }
+
+        localStorage.setItem(LOCAL_STORAGE_KEYS.CART, JSON.stringify(cart));
+        toast.success("Product added to cart");
+
+    }
+
+    useEffect(() => {
+
+        console.log('Product ID: ', id);
+
+        const fetchProduct = async (id) => {
+            try {
+                dispatch(setIsLoading(true));
+                const response = await getProductById(id);
+                setProduct(response.data);
+                // console.log(response.data);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                dispatch(setIsLoading(false));
+            }
+        }
+
+        fetchProduct(id);
+
+
+    }, [id, dispatch]);
 
     return (
         <>
@@ -34,17 +84,15 @@ function ProductsSinglePage() {
                     </div>
                     <div className="grid gap-4 md:gap-10 items-start">
                         <div className="grid gap-2">
-                            <h1 className="font-bold text-3xl">Acme Circles T-Shirt</h1>
-                            <div className="text-muted-foreground">Clothing</div>
+                            <h1 className="font-bold text-3xl">{product?.name}</h1>
+                            <div className="text-muted-foreground">{product?.category}</div>
                         </div>
                         <div className="grid gap-4 text-sm leading-loose">
-                            <p>
-                                60% combed ringspun cotton/40% polyester jersey tee. Soft, lightweight, and comfortable for everyday wear.
-                            </p>
-                            <p>
-                                The Acme Circles T-Shirt features a bold, graphic design with a playful pattern of circles in various sizes
-                                and colors. This versatile top can be dressed up or down, making it a wardrobe staple.
-                            </p>
+                            {product?.description}
+                        </div>
+
+                        <div className="grid gap-4 text-sm leading-loose">
+                            <span className="text-lg font-bold">Rs. {product?.price.toFixed(2)}</span>
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="quantity" className="text-base">
@@ -61,7 +109,7 @@ function ProductsSinglePage() {
                             </div>
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <Button size="" className="w-[200px]">Add to cart</Button>
+                            <Button size="" className="w-[200px]" onClick={addToCart}>Add to cart</Button>
                             <Button size="icon" variant="outline" className="bg-blue-600 text-white">
                                 <Heart />
                             </Button>

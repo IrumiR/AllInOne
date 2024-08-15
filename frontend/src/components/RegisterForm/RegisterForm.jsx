@@ -247,7 +247,7 @@ function RegisterForm() {
                                 name="province"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>District</FormLabel>
+                                        <FormLabel>Province</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl className="">
                                                 <SelectTrigger>

@@ -16,14 +16,14 @@ const router = express.Router();
 
 router.get('/',getAllServices);
 router.get('/:id',getServiceById);
-router.get('/remove/:id', authenticate, allowOnly(['service-provider', 'super-admin']), deleteServiceById);
+router.patch('/remove/:id', authenticate, allowOnly(['service-provider', 'super-admin']), deleteServiceById);
 router.get('/service-by-provider/:id', authenticate, allowOnly(['service-provider', 'super-admin']), getAllServicesByServiceProviderId);
 
 router.post(
     '/create',
     [
         authenticate,
-        allowOnly(['service-provider', ['super-admin']]),
+        allowOnly(['service-provider', 'super-admin']),
         check('title', 'Service name is required').not().isEmpty(),
         check('description', 'Description is required').not().isEmpty(),
         check('price', 'Price is required').not().isEmpty(),
@@ -44,7 +44,5 @@ router.patch(
     ],
     updateServiceById
 );
-
-
 
 export default router;

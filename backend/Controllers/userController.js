@@ -9,7 +9,7 @@ export const updateUser = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { $set: req.body },
-      { new: true }
+      { new: true, select: '-password -date' }
     );
 
     res.status(200).json({
@@ -40,30 +40,34 @@ export const deleteUser = async (req, res) => {
 export const getSingleUser = async (req, res) => {
   const id = req.params.id;
 
+  // return res.status(200).json({ data: id });
+
   try {
     const user = await User.findById(id).select("-password");
 
-    res.status(200).json({
-      success: true,
+    return res.status(200).json({
+      type: 'success',
       message: "User Found",
       data: user,
     });
   } catch (error) {
-    res.status(404).json({ success: false, message: "No User Found" });
+    return res.status(404).json({ type: 'error', message: error.message });
   }
 };
 
 export const getAllUsers = async (req, res) => {
+
   try {
     const users = await User.find({}).select("-password");
 
-    res.status(200).json({
-      type: sucess,
+    return res.status(200).json({
+      type: "success",
       message: "Users Found",
       data: users,
     });
+
   } catch (error) {
-    res.status(404).json({ success: false, message: "Not Found" });
+    return res.status(404).json({ type: "error", message: error.message });
   }
 };
 
@@ -71,7 +75,7 @@ export const getUserProfile = async (req, res) => {
   const userId = req.userId;
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('-password -date');
 
     if (!user) {
       return res

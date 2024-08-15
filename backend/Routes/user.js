@@ -33,9 +33,12 @@ router.get("/:id", authenticate, allowOnly(["customer", "super-admin"]), getSing
 
 // delivery riders routes
 
-router.put("/:id", authenticate, allowOnly(["customer"]), updateUser);
+// update any user by ID (for user info)
+router.patch("/update/:id", authenticate, allowOnly(["customer", "service-provider"]), updateUser);
 router.delete("/:id", authenticate, allowOnly(["customer"]), deleteUser);
 router.get("/profile/me", authenticate, allowOnly(["customer", "super-admin", userRoles.SERVICE_PROVIDER]), getUserProfile);
 router.get("/reservations/my-reservations", authenticate, allowOnly(["customer"]), getMyReservations);
+
+router.get("/single/:id", getSingleUser); 
 
 export default router;

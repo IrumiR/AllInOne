@@ -7,6 +7,8 @@ import { setIsUserAuthenticated } from "@/store/auth.slice";
 import { getCurrentUser } from "@/services/auth.service";
 import { setUser } from "@/store/user.slice";
 
+import ProfileSettings from "@/components/Dashboard/Profile/ProfileSettings";
+
 function ProfilePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ function ProfilePage() {
   return (
     <section className="mt-20">
       <div className="container py-10">
-        her we go
+        <ProfileSettings />
       </div>
     </section>
   );

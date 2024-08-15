@@ -28,3 +28,34 @@ export const servicesCategories = [
         serviceCategoryValue: "painting-services",
     }
 ];
+
+export const productCategories = [
+    {
+        productCategoryName: "Electronics",
+        productCategoryValue: "electronics",
+    },
+    {
+        productCategoryName: "Clothing",
+        productCategoryValue: "clothing",
+    },
+    {
+        productCategoryName: "Furniture",
+        productCategoryValue: "furniture",
+    },
+    {
+        productCategoryName: "Books",
+        productCategoryValue: "books",
+    },
+    {
+        productCategoryName: "Toys",
+        productCategoryValue: "toys",
+    },
+    {
+        productCategoryName: "Shoes",
+        productCategoryValue: "shoes",
+    },
+    {
+        productCategoryName: "Jewelry",
+        productCategoryValue: "jewelry",
+    }
+];
