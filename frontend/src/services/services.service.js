@@ -1,0 +1,63 @@
+import { httpGet, httpPost, httpPatch } from "./http.service";
+
+// create service
+const createService = async (serviceData) => {
+    try {
+        const response = await httpPost('/services/create', serviceData);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+
+// update service
+const updateServiceById = async (serviceId, serviceData) => {
+    try {
+        const response = await httpPatch(`/services/update/${serviceId}`, serviceData);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+// delete service
+const deleteServiceById = async (serviceId) => {
+    try {
+        const response = await httpPatch(`/services/remove/${serviceId}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+// get service by id
+const getServiceById = async (serviceId) => {
+    try {
+        const response = await httpGet(`/services/${serviceId}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+// get all services
+const getAllServices = async () => {
+    try {
+        const response = await httpGet('/services');
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+
+// update services provider busines profile
+
+
+export { createService, getServiceById, updateServiceById, getAllServices, deleteServiceById };

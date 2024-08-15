@@ -1,0 +1,23 @@
+complete services routes - done ✅
+    - add service
+    - delete service
+    - update service
+    - disable service
+
+fix all Admin routes
+    - get all users
+
+add customer, service provider, delievery person, user roles to auth
+
+complete customer routes
+
+complete service provider routes
+
+
+complete products routes
+    - get all products by service provider
+    - get product by ID
+
+complete order routes
+    - get all orders for service provider
+    - get order by id for service provider

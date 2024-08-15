@@ -1,6 +1,8 @@
 import ServiceProvider from "../models/ServiceProviderSchema.js";
 import Booking from "../models/BookingSchema.js";
+import User from "../models/UserSchema.js";
 
+// update the services provider by service provider id
 export const updateServiceProvider = async (req, res) => {
   const id = req.params.id;
 
@@ -109,5 +111,85 @@ export const getServiceProviderProfile = async (req, res) => {
       });
   } catch (error) {
     res.status(500).json({ success: false, message: "Something went wrong" });
+  }
+};
+
+// get service provider by user id
+export const getServiceProviderByUserId = async (req, res) => {
+  const userId = req.params.id;
+
+
+  try {
+    const serviceProvider = await ServiceProvider.findOne({ userId });
+
+    if (!serviceProvider) {
+      return res.status(404).json({
+        type: 'success',
+        message: "Service provider not found",
+      });
+    }
+
+    res.status(200).json({
+      type: 'success',
+      message: "Service provider details retrieved successfully",
+      data: serviceProvider,
+    });
+  } catch (error) {
+    res.status(500).json({
+      type: 'error',
+      message: error.message,
+    });
+  }
+};
+
+// update the services provider by user id
+export const updateServiceProviderByUserId = async (req, res) => {
+  const userId = req.params.id;
+  const userData = req.body.user || {};
+  const serviceProviderData = req.body.serviceProvider || {};
+
+
+  try {
+    // Update User Data
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: userData },
+      { new: true }
+    ).select('-password -date -role');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        type: 'error',
+        message: "User not found",
+      });
+    }
+
+    // Update ServiceProvider Data
+    const updatedServiceProvider = await ServiceProvider.findOneAndUpdate(
+      { userId: userId },
+      { $set: serviceProviderData },
+      { new: true }
+    );
+
+    if (!updatedServiceProvider) {
+      return res.status(404).json({
+        type: 'error',
+        message: "Service provider not found",
+      });
+    }
+
+    res.status(200).json({
+      type: 'success',
+      message: "User and Service Provider details updated successfully",
+      data: {
+        user: updatedUser,
+        serviceProvider: updatedServiceProvider,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      type: 'error',
+      message: `An error occurred while updating the details: ${error.message}`,
+    });
   }
 };

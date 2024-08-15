@@ -1,9 +1,13 @@
-import "./App.css";
-import Layout from "./layout/Layout";
+import './globle.css'
+import './styles/App.css'
+
+import MainLayout from './layout/MainLayout'
 
 function App() {
 
-  return <Layout/>
+  return (
+    <MainLayout />
+  )
 }
 
 export default App
