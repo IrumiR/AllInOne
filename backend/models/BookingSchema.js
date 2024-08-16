@@ -2,29 +2,36 @@ import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(
   {
-    doctor: {
-      type: mongoose.Types.ObjectId,
-      ref: "Service Provider",
-      required: true,
-    },
-    user: {
-      type: mongoose.Types.ObjectId,
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    price: { type: String, required: true },
-    reservationDate: {
-      type: Date,
+    serviceProviderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ServiceProvider",
       required: true,
     },
-    status: {
+    date: {
+      type: Number,
+      required: true,
+    },
+    price: {
       type: String,
-      enum: ["pending", "approved", "cancelled"],
+      required: true,
+    },
+    bookingStatus: {
+      type: String,
+      enum: ["pending", "approved", "completed", "cancelled"],
       default: "pending",
+    },
+    paymentType: {
+      type: String,
+      enum: ["on-site", "online"],
     },
     isPaid: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   { timestamps: true }

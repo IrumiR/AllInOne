@@ -194,4 +194,38 @@ const getOrderById = async (req, res) => {
     }
 };
 
-export { createOrder, deleteOrder, editOrder, getAllOrders, getOrderById };
+// get orders by user id
+const getOrdersByUserId = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Fetch orders where userId matches
+        const orders = await OrderSchema.find({ userId })
+            .populate('products.productId')
+            .populate('products.serviceProvider')
+            .exec();
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({
+                type: 'error',
+                message: 'No orders found for this user',
+             });
+        }
+
+        res.status(200).json({
+            type: 'success',
+            message: 'Orders fetched successfully',
+            data: orders,
+        });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ 
+            type: 'error',
+            message: 'Failed to fetch orders',
+            error: error.message,
+        });
+    }
+};
+
+
+export { createOrder, deleteOrder, editOrder, getAllOrders, getOrderById, getOrdersByUserId };

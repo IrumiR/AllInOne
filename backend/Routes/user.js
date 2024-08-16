@@ -15,8 +15,10 @@ const router = express.Router();
 
 // super admin route functions
 // get all users
+
+
 router.get("/", authenticate, allowOnly(["super-admin"]), getAllUsers);
-router.get("/:id", authenticate, allowOnly(["customer", "super-admin"]), getSingleUser);
+router.get("/:id", authenticate, getSingleUser);
 
 
 // customers routes
@@ -40,5 +42,6 @@ router.get("/profile/me", authenticate, allowOnly(["customer", "super-admin", us
 router.get("/reservations/my-reservations", authenticate, allowOnly(["customer"]), getMyReservations);
 
 router.get("/single/:id", getSingleUser); 
+
 
 export default router;

@@ -1,7 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
+import { LOCAL_STORAGE_KEYS } from '@/common/constants'
+import { getBookingsByUserId } from '@/services/booking.service'
+
 import { Link } from 'react-router-dom'
+import {
+    Table,
+    TableBody,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
     Home,
     LineChart,
@@ -11,17 +23,13 @@ import {
     ShoppingCart,
     Users2,
 } from "lucide-react"
-
-import { Badge } from "@/components/ui/badge"
-
-import { Button } from "@/components/ui/button"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,61 +38,41 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-
-
-
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 
 import CustomerDashboardNavbar from './CustomerDashboardNavbar'
-import { LOCAL_STORAGE_KEYS } from '@/common/constants'
+import BookingItemComponent from '../MiniComponents/BookingListComponents/BookingItemComponent'
 
-import { getOrdersByUserId } from '@/services/orders.service'
+function CustomerBookings() {
 
-import OrderItemCompoent from '../MiniComponents/OrdersListComponents/OrderItemCompoent'
-
-function CustomerOrders() {
-
-    const [orders, setOrders] = useState([]);
+    const [bookings, setBookings] = useState([]);
     const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
 
-    // console.log('userId', userId);
+    console.log('userId', userId);
 
     // get order by user id
 
     useEffect(() => {
-            const fetchOrders = async () => {
-                try {
-                    const response = await getOrdersByUserId(userId);
-                    console.log('response', response.data);
-                    setOrders(response.data);
-                } catch (error) {
-                    console.error("Failed to fetch orders", error);
-                }
+        const fetchBookings = async () => {
+            try {
+                const response = await getBookingsByUserId(userId);
+                console.log('response', response);
+                setBookings(response);
+            } catch (error) {
+                console.error("Failed to fetch bookings", error);
             }
-    
-            fetchOrders();
-        } , [userId]);
+        }
 
-    
+        fetchBookings();
+    }, [userId]);
 
     return (
-
         <section className="mt-20">
             <div className="container">
                 <div className="flex min-h-screen w-full flex-col relative border rounded-lg overflow-hidden">
@@ -147,7 +135,6 @@ function CustomerOrders() {
                             </Sheet>
 
                             <div className="header-menu-wrapper w-full flex flex-row justify-between">
-
                                 <div>
                                     <Breadcrumb>
                                         <BreadcrumbList>
@@ -200,88 +187,55 @@ function CustomerOrders() {
                         </header>
                         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-1 xl:grid-cols-1">
                             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-                                {/* <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-                                    <Card
-                                        className="sm:col-span-2" x-chunk="dashboard-05-chunk-0"
-                                    >
-                                        <CardHeader className="pb-3">
-                                            <CardTitle>Your Orders</CardTitle>
-                                            <CardDescription className="max-w-lg text-balance leading-relaxed">
-                                                Introducing Our Dynamic Orders Dashboard for Seamless
-                                                Management and Insightful Analysis.
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardFooter>
-                                            <Button>Create New Order</Button>
-                                        </CardFooter>
-                                    </Card>
-                                    <Card x-chunk="dashboard-05-chunk-1">
-                                        <CardHeader className="pb-2">
-                                            <CardDescription>This Week</CardDescription>
-                                            <CardTitle className="text-4xl">$1,329</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="text-xs text-muted-foreground">
-                                                +25% from last week
-                                            </div>
-                                        </CardContent>
-                                        <CardFooter>
-                                            <Progress value={25} aria-label="25% increase" />
-                                        </CardFooter>
-                                    </Card>
-                                    <Card x-chunk="dashboard-05-chunk-2">
-                                        <CardHeader className="pb-2">
-                                            <CardDescription>This Month</CardDescription>
-                                            <CardTitle className="text-4xl">$5,329</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="text-xs text-muted-foreground">
-                                                +10% from last month
-                                            </div>
-                                        </CardContent>
-                                        <CardFooter>
-                                            <Progress value={12} aria-label="12% increase" />
-                                        </CardFooter>
-                                    </Card>
-                                </div> */}
                                 <div>
-                                    <Card x-chunk="dashboard-05-chunk-3">
-                                        <CardHeader className="px-7">
-                                            <CardTitle>Orders</CardTitle>
-                                            <CardDescription>
-                                                Recent orders from your store.
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <Table>
-                                                <TableHeader>
-                                                    <TableRow>
-                                                        <TableHead>Customer</TableHead>
-                                                        {/* <TableHead className="hidden sm:table-cell">
-                                                            Type
-                                                        </TableHead> */}
-                                                        <TableHead className="hidden sm:table-cell">
-                                                            Status
-                                                        </TableHead>
-                                                        <TableHead className="hidden md:table-cell">
-                                                            Date
-                                                        </TableHead>
-                                                        <TableHead className="text-right">Amount</TableHead>
-                                                        <TableHead className="hidden sm:table-cell">
+                                    {
+                                        bookings.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center h-96">
+                                                <h3 className="text-2xl font-bold">No bookings found</h3>
+                                                <p className="text-lg text-muted-foreground mb-3">Please headover to services area.</p>
+                                                <Link to="/services-list" className={buttonVariants({ variant: "default", size: "lg" })}>Visit Now</Link>
+                                            </div>
+                                        )
+                                            :
+                                            <Card x-chunk="dashboard-05-chunk-3">
+                                                <CardHeader className="px-7">
+                                                    <CardTitle>Bookings</CardTitle>
+                                                    <CardDescription>
+                                                        Recent bookings for you.
+                                                    </CardDescription>
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <Table>
+                                                        <TableHeader>
+                                                            <TableRow>
+                                                                <TableHead>Booking</TableHead>
+                                                                {/* <TableHead className="hidden sm:table-cell">
+                                                    Type
+                                                </TableHead> */}
+                                                                <TableHead className="hidden sm:table-cell">
+                                                                    Status
+                                                                </TableHead>
+                                                                <TableHead className="hidden md:table-cell">
+                                                                    Date
+                                                                </TableHead>
+                                                                <TableHead className="text-right">Amount</TableHead>
+                                                                {/* <TableHead className="hidden sm:table-cell">
                                                             Action
-                                                        </TableHead>
-                                                    </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
-                                                    {
-                                                        orders.map((order) => (
-                                                            <OrderItemCompoent key={order._id} itemData={order} />
+                                                        </TableHead> */}
+                                                            </TableRow>
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {
+                                                        bookings.map((booking) => (
+                                                            <BookingItemComponent key={booking._id} itemData={booking} />
                                                         ))
                                                     }
-                                                </TableBody>
-                                            </Table>
-                                        </CardContent>
-                                    </Card>
+                                                        </TableBody>
+                                                    </Table>
+                                                </CardContent>
+                                            </Card>
+                                    }
+
                                 </div>
                             </div>
                         </main>
@@ -292,4 +246,4 @@ function CustomerOrders() {
     )
 }
 
-export default CustomerOrders
+export default CustomerBookings

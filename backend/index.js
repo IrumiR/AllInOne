@@ -17,6 +17,7 @@ import serviceRoute from "./Routes/services.Router.js";
 import cloudinaryRouter from "./Routes/cloudinary.Router.js";
 import productRoute from "./Routes/products.Router.js";
 import ordersRoute from "./Routes/orders.Router.js";
+import bookingRouter from "./Routes/bookings.Router.js";
 
 dotenv.config()
 
@@ -47,6 +48,7 @@ app.use('/api/v1/reviews', reviewRoute)
 app.use('/api/v1/services', serviceRoute)
 app.use('/api/v1/products', productRoute)
 app.use('/api/v1/orders', ordersRoute);
+app.use('/api/v1/bookings', bookingRouter);
 
 app.get('/api/v1/get-signature', (req, res) => {
     // res.send('Signature route working');
@@ -62,7 +64,7 @@ app.get('/api/v1/get-signature', (req, res) => {
 })
 
 // stripe
-app.post('/api/v1/create-checkout-session', async (req, res) => {
+app.post('/api/v1/create-order-checkout-session', async (req, res) => {
 
     const { cartItems, orderId, userId } = req.body;
 
@@ -91,11 +93,54 @@ app.post('/api/v1/create-checkout-session', async (req, res) => {
         shipping_address_collection: {
             allowed_countries: ['US', 'CA', 'LK'], // Adjust based on your needs
         },
-        success_url: `${process.env.CLIENT_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.CLIENT_CANCEL_URL}`,
+        success_url: `${process.env.CLIENT_ORDER_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_ORDER_CANCEL_URL}`,
         metadata: {
             orderId,
             userId,
+        }
+    });
+    res.json({ sessionId: session.id });
+});
+
+
+// stripe booking session init
+app.post('/api/v1/create-booking-checkout-session', async (req, res) => {
+
+    const bookingInfo = req.body;
+
+    // return res.json({ bookingInfo });
+
+    const lineItems = [
+        {
+            price_data: {
+                currency: "usd",
+                product_data: {
+                    name: bookingInfo.serviceName,
+                    // images: [bookingInfo.serviceImage],
+                },
+                unit_amount: 2000,
+            },
+            quantity: 1,
+        }]
+
+    // return res.json({lineItems});
+
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: lineItems,
+        mode: "payment",
+        shipping_address_collection: {
+            allowed_countries: ['US', 'CA', 'LK'], // Adjust based on your needs
+        },
+        success_url: `${process.env.CLIENT_BOOKING_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_BOOKING_CANCEL_URL}`,
+        metadata: {
+            bookingId: bookingInfo.bookingId,
+            userId: bookingInfo.clientId._id,
+            serviceId: bookingInfo.serviceId,
+            serviceName: bookingInfo.serviceName,
+
         }
     });
     res.json({ sessionId: session.id });
@@ -110,13 +155,15 @@ app.get('/api/v1/payment-success', async (req, res) => {
             expand: ['payment_intent', 'shipping'],
         });
 
-        return res.json(session);
+        // return res.json(session);
 
         // Access the shipping details
         const shippingDetails = session.payment_intent.shipping;
+        const metadata = session.metadata;
 
         const data = {
             shippingDetails,
+            metadata,
         };
 
         // Use this data in your application (e.g., save to your database)
@@ -130,6 +177,7 @@ app.get('/api/v1/payment-success', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 app.listen(port, () => {
