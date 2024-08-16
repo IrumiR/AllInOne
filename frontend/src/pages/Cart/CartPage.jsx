@@ -3,13 +3,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 import { STRIPE_PUBLISHABLE_KEY } from '@/config/app.config';
 import { initializeCart } from '@/store/cart.slice';
 import { setIsLoading } from '@/store/loading.slice';
 import { createOrder } from '@/services/orders.service';
 import { getCurrentUser } from '@/services/auth.service';
-import { setIsUserAuthenticated } from "@/store/auth.slice"
+import { setIsUserAuthenticated } from "@/store/auth.slice";
 import { setUser, setUserRole } from '@/store/user.slice';
 import { LOCAL_STORAGE_KEYS } from '@/common/constants';
 
@@ -18,35 +19,56 @@ import { Button } from '@/components/ui/button';
 
 function CartPage() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const cartItems = useSelector((state) => state.cart.items);
     const totalPrice = useSelector((state) => state.cart.totalPrice);
-    // const user = useSelector((state) => state.user);
-    const [localUser, setLocaUser] = useState('')
+    const [localUser, setLocalUser] = useState('');
 
-    // console.log('user', user.user.data._id);
+    useEffect(() => {
+        const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+
+        if (!userId) {
+            navigate('/login');
+            return;
+        }
+
+        const fetchUserData = async () => {
+            try {
+                const currentUser = await getCurrentUser(userId);
+
+                dispatch(setIsUserAuthenticated(true));
+                dispatch(setUser(currentUser));
+                setLocalUser(currentUser);
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+                dispatch(setIsUserAuthenticated(false));
+                navigate('/login');
+            }
+        };
+
+        dispatch(initializeCart());
+        fetchUserData();
+    }, [dispatch, navigate]);
 
     const handleCheckout = async () => {
-        
         if (localUser) {
-            console.log('localUser', localUser);
-
             const stripePromise = await loadStripe(STRIPE_PUBLISHABLE_KEY);
 
             try {
                 dispatch(setIsLoading(true));
 
-                const formattedCartItems = cartItems.map((item) => {
-                    return {
-                        productId: item._id,
-                        name: item.name,
-                        price: item.price,
-                        category: item.category,
-                        quantity: item.quantity,
-                        image: item.image,
-                    };
-                })
+                // foramt cart items for stripe
+                const formattedCartItems = cartItems.map((item) => ({
+                    productId: item._id,
+                    name: item.name,
+                    price: item.price,
+                    category: item.category,
+                    quantity: item.quantity,
+                    image: item.image,
+                }));
 
-                const shppingData = {
+                // shipping data
+                const shippingData = {
                     address_line_1: localUser?.data?.address_line_1,
                     address_line_2: localUser?.data?.address_line_2,
                     city: localUser?.data?.city,
@@ -54,35 +76,24 @@ function CartPage() {
                     province: localUser?.data?.province,
                     postal_code: localUser?.data?.postal_code || '00000',
                     phone: localUser?.data?.phone,
-                }
+                };
 
-                console.log('formattedCartItems: ', shppingData);
-                // return false;
-
-                // create order
+                // order info
                 const orderData = {
                     userId: localUser.data._id,
                     products: formattedCartItems,
                     totalAmount: totalPrice,
                     orderStatus: 'pending',
-                    shippingAddress: shppingData,
-                }
-  
-                
+                    shippingAddress: shippingData,
+                };
+
                 const newOrder = await createOrder(orderData);
-                console.log('orderData', newOrder?.data._id);
-
-                const orderId = newOrder?.data._id;
-                const userId = newOrder?.data.userId;
-                const newOrderProducts = newOrder?.data.products;
-
-                const response = await axios.post('http://localhost:3999/api/v1/create-checkout-session', { cartItems: newOrderProducts, orderId, userId });
-
-                console.log('response', response.data);
-
-                // return false;
-
-                const { sessionId } = response.data;
+                
+                const { sessionId } = await axios.post('http://localhost:3999/api/v1/create-order-checkout-session', {
+                    cartItems: newOrder.data.products,
+                    orderId: newOrder.data._id,
+                    userId: newOrder.data.userId,
+                }).then((response) => response.data);
 
                 const stripe = await stripePromise;
                 await stripe.redirectToCheckout({ sessionId });
@@ -92,34 +103,10 @@ function CartPage() {
             } finally {
                 dispatch(setIsLoading(false));
             }
-
+        } else {
+            navigate('/login');
         }
-    }
-
-    useEffect(() => {
-        dispatch(initializeCart());
-
-        // get user
-        const fetchUserData = async () => {
-
-            const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
-            const userRole = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ROLE);
-            const currentUser = await getCurrentUser(userId);
-
-            // set user is authenticated
-            dispatch(setIsUserAuthenticated(true));
-
-            // set user in redux state
-            dispatch(setUser(currentUser));
-            // dispatch(setUserRole(userRole));
-            setLocaUser(currentUser);
-        }
-
-        fetchUserData();
-
-    }, [dispatch]);
-
-
+    };
 
     return (
         <section className="mt-20 max-w-[1200px] mx-auto px-4">
@@ -141,7 +128,6 @@ function CartPage() {
                     </>
                 )}
             </div>
-
         </section>
     );
 }

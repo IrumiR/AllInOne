@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import { servicesData } from '@/common/displayOnlyData'
+// import { servicesData } from '@/common/displayOnlyData'
 import coverBG from '@images/cover-bg-img.jpg';
 import { fetchServices } from '@/store/services.slice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +23,7 @@ export default function ServicesPage() {
 
 
   const { loading, data, error } = useSelector((state) => state.services)
+  const servicesData = data;
 
   const dispatch = useDispatch();
 
@@ -36,11 +37,11 @@ export default function ServicesPage() {
 
     loadServices();
 
-  },[])
+  },[dispatch])
 
-  useEffect(() => {
-    dispatch(setIsLoading(loading));
-  }), [loading]
+  // useEffect(() => {
+  //   dispatch(setIsLoading(loading));
+  // }), [loading]
 
   // console.log("data: ", data)
   
@@ -68,13 +69,14 @@ export default function ServicesPage() {
           {
             servicesData.map((service) => (
               <ProductServiceCard
-                key={service.id}
+                key={service?._id}
                 classNames=""
-                title={service.title}
-                description={service.description}
-                price={service.price}
-                banner={service.banner}
-                link={'/services-single'}
+                title={service?.title}
+                description={service?.description}
+                price={service?.price}
+                banner={service?.image}
+                link={`/services/${service._id}`}
+                id={service.id}
               />
             ))
           }

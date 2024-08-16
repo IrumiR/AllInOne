@@ -41,7 +41,7 @@ const Router = () => {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/services-list" element={<ServicesPage />} />
-      <Route path="/services-single" element={<ServicesSinglePage />} />
+      <Route path="/services/:id" element={<ServicesSinglePage />} />
       <Route path="/loading-screen" element={<LoadingScreen />} />
       <Route path="/alert" element={<SucessAlert />} />
       <Route path="/login" element={<LoginPage />} />

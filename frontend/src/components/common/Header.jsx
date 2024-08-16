@@ -1,20 +1,28 @@
 import { useEffect, useState } from "react";
 import { headerMenuData } from "@/common/menuLinkData"
-import { Link } from "react-router-dom"
-import { buttonVariants, Button } from "../ui/button"
-import logo from '../../assets/images/all-in-one-logo.png'
+import { Link, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux";
+
 import { logout } from "@/store/auth.slice";
 import { LOCAL_STORAGE_KEYS } from "@/common/constants";
-import { useNavigate } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
+
+import logo from '../../assets/images/all-in-one-logo.png'
+import { buttonVariants, Button } from "../ui/button"
 
 function Header() {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const isUserAuthenticated = useSelector((state) => state.auth.isUserAuthenticated);
+    const user = useSelector((state) => state.auth.user);
+    const [noOfitems, setNoOfItems] = useState(0);
+    const cartItems = useSelector((state) => state.cart.items);
+
+    // console.log("cartItems", cartItems);
 
     const [scrollClass, setScrollClass] = useState("bg-transparent");
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,6 +44,13 @@ function Header() {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
+
+    useEffect(() => {
+        if (cartItems) {
+            setNoOfItems(cartItems ? cartItems.length : 0);
+        }
+    }, [cartItems]);
+
 
     const handleLogout = () => {
 
@@ -70,6 +85,13 @@ function Header() {
 
                             </ul>
                         </nav>
+
+                        <div className="icon-wrapper">
+                            <Link to="/cart" className="relative">
+                                <ShoppingCart size={24} />
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">{noOfitems}</span>
+                            </Link>
+                        </div>
 
                         <div className="flex items-center gap-4">
 

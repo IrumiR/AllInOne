@@ -1,7 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import useScrollPosition from '@/hooks/useScrollPosition'
 import useHeight from '@/hooks/useHeight'
+import { useParams } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
 
+import { getCategoryNameByValue } from '@/lib/utils'
+import { getServiceById } from '@/services/services.service'
+import { setIsLoading } from '@/store/loading.slice'
+import { servicesCategories } from '@/common/categoryNames'
+import { LOCAL_STORAGE_KEYS } from '@/common/constants'
+import { getCurrentUser } from '@/services/auth.service'
+import { setUser } from '@/store/user.slice'
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -9,7 +18,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Badge } from '@/components/ui/badge'
-import { MapPinIcon } from 'lucide-react'
+import { MapPinIcon, DollarSign } from 'lucide-react'
 import BookingForm from '@/components/BookingForm/BookingForm'
 import ReviewForm from '@/components/ReviewForm/ReviewForm'
 
@@ -19,6 +28,12 @@ function ServicesSinglePage() {
     const scrollPosition = useScrollPosition();
     const [contentHeight, divRef] = useHeight();
     const formWrapperRef = useRef(null);
+    const dispatch = useDispatch();
+    const [serviceData, setServiceData] = useState({});
+
+    const user = useSelector(state => state.user.user);
+
+    const { id } = useParams();
 
     useEffect(() => {
         if (formWrapperRef.current) {
@@ -32,6 +47,51 @@ function ServicesSinglePage() {
         }
     }, [scrollPosition.y, contentHeight]);
 
+    useEffect(() => {
+        console.log("ID: ", id);
+
+        // fecthc service data
+        const fetchServiceDetails = async () => {
+            try {
+                dispatch(setIsLoading(true));
+                const service = await getServiceById(id);
+                console.log("Service: ", service.data);
+                setServiceData(service.data);
+            } catch (error) {
+                console.log("Error: ", error);
+            }finally {
+                dispatch(setIsLoading(false));
+            }
+        }
+
+        fetchServiceDetails();
+
+    }, [id, dispatch]);
+
+    // get currnt user
+    useEffect(() => {
+        // get current user
+        const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+
+        const fetchCurrentUser = async () => {
+            try {
+                dispatch(setIsLoading(true));
+                const user = await getCurrentUser(userId);
+                console.log("User: ", user.data);
+
+                dispatch(setUser(user.data));
+            } catch (error) {
+                console.log("Error: ", error);
+            }
+            finally {
+                dispatch(setIsLoading(false));
+            }
+        }
+
+        fetchCurrentUser();
+
+    } ,[dispatch]);
+
 
     return (
         <>
@@ -39,7 +99,7 @@ function ServicesSinglePage() {
                 <div className="container grid grid-cols-1 gap-6 md:grid-cols-[2fr_1fr] lg:gap-12 items-start">
                     <div className="grid gap-6 pl-0">
                         <img
-                            src="https://images.pexels.com/photos/9029162/pexels-photo-9029162.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
+                            src={serviceData?.image}
                             alt="Service Banner"
                             width={1200}
                             height={600}
@@ -47,20 +107,17 @@ function ServicesSinglePage() {
                         />
                         <div className="flex items-center gap-1 text-sm">
                             {/* <TagIcon className="w-4 h-4" /> */}
-                            <Badge variant="secondary" className="py-2 px-4">Landscaping</Badge>
+                            <Badge variant="secondary" className="py-2 px-4">{getCategoryNameByValue(serviceData?.category, servicesCategories)}</Badge>
                         </div>
                         <div className="grid gap-4">
-                            <h1 className="text-3xl font-bold">Premium Landscaping Services</h1>
+                            <h1 className="text-3xl font-bold">{serviceData?.title}</h1>
+                            <h3 className="text-xl font-semibold flex">
+                                <DollarSign className="w-5"/>
+                                <span>{serviceData?.price}</span>
+                            </h3>
                             <div className="grid gap-2 text-muted-foreground">
                                 <p>
-                                    Experience the ultimate in outdoor transformation with our premium landscaping services. Our team of
-                                    skilled professionals will work closely with you to bring your vision to life, creating a stunning and
-                                    functional outdoor oasis that will enhance the beauty of your property.
-                                </p>
-                                <p>
-                                    From meticulously manicured gardens to intricate hardscaping features, we handle every aspect of your
-                                    landscaping project with the utmost care and attention to detail. Our commitment to excellence ensures
-                                    that you'll be thrilled with the final result.
+                                    {serviceData?.description}
                                 </p>
                             </div>
                             <div className="flex items-center gap-4">
@@ -73,7 +130,10 @@ function ServicesSinglePage() {
                         </div>
                     </div>
                     <div ref={formWrapperRef} className={`service-booking-form-wrapper relative lg:fixed transition-all grid gap-6 sm:right-[1vw] md:right-[4vw] xl:right-0 2xl:right-[10vw] lg:max-w-[350px] xl:max-w-[450px]`}>
-                        <BookingForm />
+                        <BookingForm
+                        serviceInfo={serviceData ?? serviceData}
+                        userInfo={user ?? user}
+                        />
                     </div>
                 </div>
             </section>
