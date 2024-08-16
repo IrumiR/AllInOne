@@ -22,5 +22,16 @@ const getBookingById = async (bookingId) => {
   }
 }
 
+// get booking by user id
+const getBookingsByUserId = async (userId) => {
+  try {
+    const response = await httpGet(`/bookings/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error getting bookings");
+  }
+}
 
-export { createBooking, getBookingById };
+
+export { createBooking, getBookingById, getBookingsByUserId };

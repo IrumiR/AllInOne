@@ -31,11 +31,9 @@ const login = async (email, password) => {
   }
 };
 
-const getCurrentUser = async (id) => {
+const getCurrentUser = async () => {
   try {
-    const response = await httpGet(`${BACKEND_BASE_URL}/users/profile/me`, {
-      id: id,
-    });
+    const response = await httpGet(`/users/profile/me`);
     const data = response.data;
     return data;
   } catch (error) {
@@ -43,4 +41,24 @@ const getCurrentUser = async (id) => {
   }
 };
 
-export { login, getCurrentUser, customerRegister };
+const getUserProfile = async () => {
+  try {
+    const response = await httpGet(`/users/profile/me`);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    throw error?.response?.data;
+  }
+}
+
+const getUserProfileData = async () => {
+  try {
+    const response = await httpGet(`/users/profile/`);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    throw error?.response?.data;
+  }
+}
+
+export { login, getCurrentUser, customerRegister, getUserProfile, getUserProfileData };

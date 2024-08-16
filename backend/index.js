@@ -93,8 +93,8 @@ app.post('/api/v1/create-order-checkout-session', async (req, res) => {
         shipping_address_collection: {
             allowed_countries: ['US', 'CA', 'LK'], // Adjust based on your needs
         },
-        success_url: `${process.env.CLIENT_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.CLIENT_CANCEL_URL}`,
+        success_url: `${process.env.CLIENT_ORDER_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_ORDER_CANCEL_URL}`,
         metadata: {
             orderId,
             userId,
@@ -103,35 +103,6 @@ app.post('/api/v1/create-order-checkout-session', async (req, res) => {
     res.json({ sessionId: session.id });
 });
 
-app.get('/api/v1/payment-success', async (req, res) => {
-    const session_id = req.query.session_id;
-
-
-    try {
-        const session = await stripe.checkout.sessions.retrieve(session_id, {
-            expand: ['payment_intent', 'shipping'],
-        });
-
-        // return res.json(session);
-
-        // Access the shipping details
-        const shippingDetails = session.payment_intent.shipping;
-
-        const data = {
-            shippingDetails,
-        };
-
-        // Use this data in your application (e.g., save to your database)
-        res.status(200).json({
-            type: 'success',
-            message: 'Payment successful',
-            data: data,
-        });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // stripe booking session init
 app.post('/api/v1/create-booking-checkout-session', async (req, res) => {
@@ -162,8 +133,8 @@ app.post('/api/v1/create-booking-checkout-session', async (req, res) => {
         shipping_address_collection: {
             allowed_countries: ['US', 'CA', 'LK'], // Adjust based on your needs
         },
-        success_url: `${process.env.CLIENT_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.CLIENT_CANCEL_URL}`,
+        success_url: `${process.env.CLIENT_BOOKING_SUCCESS_URL}/?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_BOOKING_CANCEL_URL}`,
         metadata: {
             bookingId: bookingInfo.bookingId,
             userId: bookingInfo.clientId._id,
@@ -174,6 +145,39 @@ app.post('/api/v1/create-booking-checkout-session', async (req, res) => {
     });
     res.json({ sessionId: session.id });
 });
+
+app.get('/api/v1/payment-success', async (req, res) => {
+    const session_id = req.query.session_id;
+
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(session_id, {
+            expand: ['payment_intent', 'shipping'],
+        });
+
+        // return res.json(session);
+
+        // Access the shipping details
+        const shippingDetails = session.payment_intent.shipping;
+        const metadata = session.metadata;
+
+        const data = {
+            shippingDetails,
+            metadata,
+        };
+
+        // Use this data in your application (e.g., save to your database)
+        res.status(200).json({
+            type: 'success',
+            message: 'Payment successful',
+            data: data,
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 app.listen(port, () => {

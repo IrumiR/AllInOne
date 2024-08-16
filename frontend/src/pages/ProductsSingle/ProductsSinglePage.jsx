@@ -13,6 +13,7 @@ import { MinusIcon, PlusIcon, Heart } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import ReviewForm from '@/components/ReviewForm/ReviewForm'
 import { toast } from 'sonner';
+import { addItem } from "@/store/cart.slice";
 
 function ProductsSinglePage() {
 
@@ -44,6 +45,10 @@ function ProductsSinglePage() {
 
         localStorage.setItem(LOCAL_STORAGE_KEYS.CART, JSON.stringify(cart));
         toast.success("Product added to cart");
+
+        // update redux cart state
+        dispatch(addItem({ ...product, quantity: quantity, totalPrice: product.price * quantity }));
+
 
     }
 

@@ -15,7 +15,9 @@ import {
     Settings,
     ShoppingCart,
     Users2,
+    Calendar
   } from "lucide-react"
+import { Link } from 'react-router-dom';
 
 function CustomerDashboardNavbar() {
     return (
@@ -43,51 +45,27 @@ function CustomerDashboardNavbar() {
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <a
-                                href="#"
+                            <Link
+                                to="/dashboard/orders"
                                 className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                             >
                                 <ShoppingCart className="h-5 w-5" />
                                 <span className="sr-only">Orders</span>
-                            </a>
+                            </Link>
                         </TooltipTrigger>
                         <TooltipContent side="right">Orders</TooltipContent>
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <a
-                                href="#"
+                                href="/dashboard/bookings"
                                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                             >
-                                <Package className="h-5 w-5" />
-                                <span className="sr-only">Products</span>
+                                <Calendar className="h-5 w-5" />
+                                <span className="sr-only">Bookings</span>
                             </a>
                         </TooltipTrigger>
-                        <TooltipContent side="right">Products</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <a
-                                href="#"
-                                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                            >
-                                <Users2 className="h-5 w-5" />
-                                <span className="sr-only">Customers</span>
-                            </a>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">Customers</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <a
-                                href="#"
-                                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                            >
-                                <LineChart className="h-5 w-5" />
-                                <span className="sr-only">Analytics</span>
-                            </a>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">Analytics</TooltipContent>
+                        <TooltipContent side="right">Bookings</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </nav>

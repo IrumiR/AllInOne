@@ -110,10 +110,12 @@ function CartPage() {
 
     return (
         <section className="mt-20 max-w-[1200px] mx-auto px-4">
-            <div className="container">
+            <div className="container min-h-[50vh]">
                 <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
                 {cartItems.length === 0 ? (
-                    <p>Your cart is empty.</p>
+                    <div className=''>
+                        <p>Your cart is empty.</p>
+                    </div>
                 ) : (
                     <>
                         {cartItems.map((item) => (

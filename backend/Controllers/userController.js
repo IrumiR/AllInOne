@@ -72,7 +72,9 @@ export const getAllUsers = async (req, res) => {
 };
 
 export const getUserProfile = async (req, res) => {
+
   const userId = req.userId;
+
 
   try {
     const user = await User.findById(userId).select('-password -date');
@@ -85,11 +87,9 @@ export const getUserProfile = async (req, res) => {
 
     const { password, ...rest } = user._doc;
 
-    res
-      .status(200)
-      .json({ success: true, message: "Profile is set", data: { ...rest } });
+    return res.status(200).json({ type: 'success', message: "Profile is set", data: { ...rest } });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Something went wrong" });
+    return res.status(500).json({ type: 'error', message: error.message });
   }
 };
 

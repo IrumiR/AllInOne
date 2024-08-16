@@ -11,4 +11,15 @@ const updateUserById = async (userId, userData) => {
     }
 }
 
-export { updateUserById };
+// get user by ID
+const getUserById = async (userId) => {
+    try {
+        const response = await httpGet(`/users/single/${userId}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+export { updateUserById, getUserById };

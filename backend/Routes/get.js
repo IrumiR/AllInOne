@@ -14,7 +14,7 @@ router.get('/:id', authenticate, allowOnly(['customer', 'service-provider', 'ser
 router.patch('/:id', authenticate, allowOnly(['customer', 'service-provider', 'services-provider']), updateBookingById);
 
 // get booking by user id
-router.get('/user/:userId', getBookingsByUserId);
+router.get('/user/:userId', authenticate, allowOnly(['customer', 'super-admin', ['service-provider']]), getBookingsByUserId);
 
 
 export default router;

@@ -16,6 +16,9 @@ import RegisterPage from "@/pages/Register/RegisterPage";
 import ProfilePage from "@/pages/Profile/ProfilePage";
 import CartPage from "@/pages/Cart/CartPage";
 import OrderSuccess from "@/pages/OrderSuccess/OrderSuccess";
+import BookingSuccess from "@/pages/BookingSuccess/BookingSuccess";
+import AllOrdersPage from "@/components/Dashboard/AllOrdersPage";
+import AllBookingsPage from "@/components/Dashboard/AllBookingsPage";
 
 import DashboardPage from "@/pages/Dashboard/DashboardPage";
 import ProfileSettings from "@/components/Dashboard/Profile/ProfileSettings";
@@ -52,17 +55,18 @@ const Router = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/booking-success" element={<BookingSuccess />} />
 
       <Route path="/dashboard/" element={<DashboardPage />} />
       <Route path="/profile/business-profile" element={<BusinessProfileSettings />} />
 
 
-      <Route path="/dashboard/orders/" element={<ServicesProviderOrders />} />
+      <Route path="/dashboard/orders/" element={<AllOrdersPage />} />
       <Route path="/dashboard/orders/:id" element={<CustomerOrderSingle />} />
       <Route path="/dashboard/products/" element={<ServicesProviderProducts />} />
       <Route path="/dashboard/products/add/" element={<ServicesProviderProductsAddEdit />} />
       <Route path="/dashboard/products/:id" element={<ServicesProviderProductsAddEdit />} />
-      <Route path="/dashboard/bookings/" element={<ServicesProviderBookings />} />
+      <Route path="/dashboard/bookings/" element={<AllBookingsPage />} />
       
       <Route path="/dashboard/services/" element={<ServicesProviderServices />} />
       <Route path="/dashboard/services/add" element={<ServicesProviderServiceAddEdit />} />

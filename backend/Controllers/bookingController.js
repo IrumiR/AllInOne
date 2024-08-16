@@ -123,4 +123,46 @@ const updateBookingById = async (req, res) => {
     }
 };
 
-export { createBooking, getBookingById, updateBookingById };
+// get booking by user ID (for customers)
+const getBookingsByUserId = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const bookings = await Booking.find({ clientId: userId })
+            .populate('clientId', 'name email') // Populate user details if needed
+            .populate('serviceProviderId', 'businessName') // Populate service provider details if needed
+            .exec();
+
+        if (!bookings || bookings.length === 0) {
+            return res.status(404).json({ message: 'No bookings found for this user.' });
+        }
+
+        res.status(200).json(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ message: 'Server error while fetching bookings.' });
+    }
+};
+
+
+const getBookingsByServiceProviderId = async (req, res) => {
+    const { serviceProviderId } = req.params;
+
+    try {
+        const bookings = await Booking.find({ serviceProviderId })
+            .populate('clientId', 'name email') // Populate user details if needed
+            .populate('serviceProviderId', 'businessName') // Populate service provider details if needed
+            .exec();
+
+        if (!bookings || bookings.length === 0) {
+            return res.status(404).json({ message: 'No bookings found for this service provider.' });
+        }
+
+        res.status(200).json(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ message: 'Server error while fetching bookings.' });
+    }
+};
+
+export { createBooking, getBookingById, updateBookingById, getBookingsByUserId };

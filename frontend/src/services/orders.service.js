@@ -31,4 +31,14 @@ const createOrder = async (orderData) => {
     }
 }
 
-export { getAllOrders, updateOrder, createOrder };
+// get order by user id
+const getOrdersByUserId = async (userId) => {
+    try {
+        const response = await httpGet(`/orders/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+export { getAllOrders, updateOrder, createOrder, getOrdersByUserId };
