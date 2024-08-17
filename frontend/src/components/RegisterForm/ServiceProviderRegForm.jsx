@@ -2,11 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { districts, provinceData } from '@/common/displayOnlyData';
+import { servicesCategories } from '@/common/categoryNames';
 import { customerRegister } from '@/services/auth.service';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsUserAuthenticated } from "@/store/auth.slice";
 import { LOCAL_STORAGE_KEYS } from "@/common/constants";
+import { setIsLoading } from "@/store/loading.slice";
 
 // components
 import { Label } from "@/components/ui/label"
@@ -28,7 +30,9 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner";
+
 
 const formSchema = z.object({
     firstName: z.string().min(3, { message: "First Name mustbe at least 3 characters" }),
@@ -43,6 +47,13 @@ const formSchema = z.object({
     district: z.string(),
     city: z.string().min(3, { message: "City mustbe at least 3 characters" }),
     postal_code: z.string().min(5, { message: "Postal Code mustbe at least 5 characters" }),
+    businessName: z.string().min(3, { message: "Business Name mustbe at least 3 characters" }),
+    businessAddress: z.string().min(3, { message: "Business Address mustbe at least 3 characters" }),
+    businessPhone: z.string().length(10, { message: "Business Phone must be 10 characters" }),
+    serviceCategory: z.string(),
+    workingAreas: z.string(),
+    businessEmail: z.string().email("email should be a valid email").min(3, { message: "Business Email must be at least 3 characters" }),
+    businessWebsite: z.string().url("Website should be a valid URL"),
 }).superRefine(({ password, confirmPassword }, ctx) => {
     if (password !== confirmPassword) {
         ctx.addIssue({
@@ -54,7 +65,7 @@ const formSchema = z.object({
 });
 
 
-function RegisterForm() {
+function ServiceProviderRegForm() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -75,36 +86,50 @@ function RegisterForm() {
             district: "",
             city: "",
             postal_code: "0000",
+            businessName: "",
+            businessAddress: "",
+            businessPhone: "",
+            serviceCategory: "",
+            workingAreas: "",
+            businessEmail: "",
+            businessWebsite: "",
         },
     })
 
     const onSubmit = async (values) => {
         try {
-            const registerResponse = await customerRegister({ ...values, role: "customer" });
-            // console.log(registerResponse);
+            dispatch(setIsLoading(true));
+            const registerResponse = await customerRegister({ ...values, role: "service-provider", businessContactNumbers:{'WhatsApp' :values.businessPhone} });
+            console.log(registerResponse);
 
+            // return false;
             // set user authneicated true
             dispatch(setIsUserAuthenticated(true));
 
             // save token to local storage
-            localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, registerResponse.token);
+            localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, registerResponse.data.token);
 
             // sucess message
             toast.success(registerResponse.message);
 
             // redirect to profile page
-            navigate("/profile");
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 2000);
 
         } catch (error) {
 
             toast.error(error.message);
+        }
+        finally{
+            dispatch(setIsLoading(false));
         }
     }
 
     return (
         <div className="mx-auto space-y-6 py-12">
             <div className="space-y-2 text-center">
-                <h1 className="text-3xl font-bold">Register as a Customer</h1>
+                <h1 className="text-3xl font-bold">Register as a Services Provider</h1>
                 <p className="text-muted-foreground">Create your account to get started.</p>
             </div>
             <Form {...form}>
@@ -324,6 +349,153 @@ function RegisterForm() {
                             />
                         </div>
                     </div>
+
+
+                    <div className="sep mt-7">
+                        <h4 className="text-lg font-medium leading">Bussiness Details</h4>
+                        <p className=" text-muted-foreground">
+                            Enter your business details bellow.
+                        </p>
+                        <Separator className="my-4" />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="businessName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Your Business Name</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Business Name" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="businessAddress"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Business Address</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Business Address" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="businessPhone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Business Phone</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="Business Phone" {...field} className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="serviceCategory"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Business Category</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl className="">
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a service category" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {
+                                                    servicesCategories.map((cat) => (
+                                                        <SelectItem key={cat.serviceCategoryValue} value={cat.serviceCategoryValue}>{cat.serviceCategoryName}</SelectItem>
+                                                    ))
+                                                }
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="workingAreas"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>District</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl className="">
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a working area" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {
+                                                    districts.map((district) => (
+                                                        <SelectItem key={district.id} value={district.value}>{district.name}</SelectItem>
+                                                    ))
+                                                }
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="businessEmail"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Business Email</FormLabel>
+                                        <FormControl>
+                                            <Input type="email" placeholder="Business Email" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="businessWebsite"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Business Webiste</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Business Website" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
                     <Button type="submit" className="w-full">
                         Register
                     </Button>
@@ -333,4 +505,4 @@ function RegisterForm() {
     )
 }
 
-export default RegisterForm
+export default ServiceProviderRegForm

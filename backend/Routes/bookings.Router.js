@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createBooking, getBookingById, updateBookingById, getBookingsByUserId } from '../Controllers/bookingController.js';
+import { createBooking, getBookingById, updateBookingById, getBookingsByUserId, getBookingsByServiceProviderId } from '../Controllers/bookingController.js';
 import { authenticate, allowOnly } from '../auth/verifyToken.js';
 
 const router = Router();
@@ -15,6 +15,9 @@ router.patch('/:id', authenticate, allowOnly(['customer', 'service-provider', 's
 
 // get booking by user id
 router.get('/user/:userId', getBookingsByUserId);
+
+// get booking by service provider id
+router.get('/service-provider/:serviceProviderId', getBookingsByServiceProviderId);
 
 
 export default router;

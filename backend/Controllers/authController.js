@@ -127,6 +127,7 @@ export const registerServiceProvider = async (req, res) => {
       businessWebsite
   } = req.body;
 
+
   try {
       let user = await User.findOne({ email });
 
@@ -154,14 +155,16 @@ export const registerServiceProvider = async (req, res) => {
           province,
           postal_code,
           password: hashedPassword,
-          role: roleName
+          role,
       });
 
-      await user.save();
+      const savedUser  = await user.save();
+
+      // return res.status(200).json({ type: 'sucess', message: 'User Created Successfully', data: { userId: savedUser._id }});
 
 
       const serviceProvider = new ServiceProvider({
-          userId: user._id,
+          userId: savedUser._id,
           businessName,
           businessAddress,
           businessLogo,
@@ -184,7 +187,7 @@ export const registerServiceProvider = async (req, res) => {
   
       const token = generateToken(payload);
 
-      res.status(201).json({ type: 'sucess', data: { token, userId: user.userId }});
+      res.status(201).json({ type: 'sucess', message: 'Service Provider Created Successfully', data: { token, userId: user.userId }});
 
   } catch (error) {
       res.status(500).json({ type: 'error', message: error.message });

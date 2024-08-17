@@ -67,8 +67,12 @@ function LoginPage() {
       dispatch(setIsUserAuthenticated(true));
 
       // set user in redux state
-      dispatch(setUser(currentUser));
-      dispatch(setUserRole(currentUser.role));
+      dispatch(setUser(currentUser?.data));
+      dispatch(setUserRole(currentUser?.data?.role));
+
+      console.log("currentUser:", currentUser.data.role);
+
+      // return false;
 
       // reset the login form
       setEmail('');
@@ -77,8 +81,12 @@ function LoginPage() {
       // show success message
       toast.success("You have successfully logged in!");
 
-      //  navigate to profile page
-      navigate('/profile');
+      //  navigate to dashboard page
+      if (currentUser.data.role === 'delivery-person') {
+        navigate('/delivery-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
 
       // console.log("currentUser:", currentUser);
 

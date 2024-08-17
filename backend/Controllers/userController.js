@@ -117,3 +117,20 @@ export const getMyReservations = async (req, res) => {
     res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
+
+export const getAllUsersByRole = async (req, res) => {
+  const { role } = req.params;
+
+  try {
+    const users = await User.find({ role }).select("-password");
+
+    return res.status(200).json({
+      type: "success",
+      message: "Users Found",
+      data: users,
+    });
+
+  } catch (error) {
+    return res.status(404).json({ type: "error", message: error.message });
+  }
+}

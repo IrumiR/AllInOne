@@ -5,7 +5,8 @@ import {
   getAllUsers,
   getSingleUser,
   getUserProfile,
-  getMyReservations
+  getMyReservations,
+  getAllUsersByRole
 } from "../Controllers/userController.js";
 import { authenticate, allowOnly } from "../auth/verifyToken.js";
 import { userRoles } from "../constants/userRoles.constants.js";
@@ -38,10 +39,12 @@ router.get("/:id", authenticate, getSingleUser);
 // update any user by ID (for user info)
 router.patch("/update/:id", authenticate, allowOnly(["customer", "service-provider"]), updateUser);
 router.delete("/:id", authenticate, allowOnly(["customer"]), deleteUser);
-router.get("/profile/me", authenticate, allowOnly(["customer", "super-admin", userRoles.SERVICE_PROVIDER]), getUserProfile);
+router.get("/profile/me", authenticate, allowOnly(["customer", "super-admin", "delivery-person" , userRoles.SERVICE_PROVIDER]), getUserProfile);
 router.get("/reservations/my-reservations", authenticate, allowOnly(["customer"]), getMyReservations);
 
 router.get("/single/:id", getSingleUser); 
+
+router.get("/role/:role", getAllUsersByRole);
 
 
 export default router;

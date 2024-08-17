@@ -33,6 +33,9 @@ const bookingSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    bookingName: {
+      type: String,
+    }
   },
   { timestamps: true }
 );

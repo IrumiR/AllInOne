@@ -138,12 +138,12 @@ export const deleteProduct = async (req, res) => {
 // get products by service provider ID
 export const getProductsByServiceProviderId = async (req, res) => {
 
-    const serviceProviderId = req.userId;
+    const serviceProviderId = req.params.id;
 
     try {
         const products = await Product.find({ serviceProviderId });
 
-        res.status(200).json({ type: "sucess", products });
+        res.status(200).json({ type: "sucess", message: 'Products receiving successfull', data: products });
 
     } catch (error) {
         res.status(500).json({ type: "error", message: error.message });

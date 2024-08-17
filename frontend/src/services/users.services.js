@@ -22,4 +22,14 @@ const getUserById = async (userId) => {
     }
 }
 
-export { updateUserById, getUserById };
+const getAllUsersByRole = async (role) => {
+    try {
+        const response = await httpGet(`/users/role/${role}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+export { updateUserById, getUserById, getAllUsersByRole };
