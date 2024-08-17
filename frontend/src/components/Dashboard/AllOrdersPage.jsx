@@ -21,7 +21,7 @@ function AllOrdersPage() {
     <div>
         {
             localRole === 'service-provider' ? (
-                <h1>Service Provider Orders</h1>
+                <ServicesProviderOrders />
             ) : (
                 <CustomerOrders />
             )

@@ -227,5 +227,32 @@ const getOrdersByUserId = async (req, res) => {
     }
 };
 
+// get products by service provider id from orders
+const getProductsByServiceProviderId = async (req, res) => {
+    const { serviceProviderId } = req.params;
 
-export { createOrder, deleteOrder, editOrder, getAllOrders, getOrderById, getOrdersByUserId };
+    try {
+        // Find orders that include products with the matching service provider ID
+        const orders = await OrderSchema.find({
+            'products.serviceProvider': serviceProviderId,
+        }).select('products'); // Only select the products field
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: 'No products found for this service provider.' });
+        }
+
+        // Extract products related to the service provider
+        const products = orders.flatMap(order => 
+            order.products.filter(product => product.serviceProvider.toString() === serviceProviderId)
+        );
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Server error while fetching products.' });
+    }
+};
+
+
+
+export { createOrder, deleteOrder, editOrder, getAllOrders, getOrderById, getOrdersByUserId, getProductsByServiceProviderId };

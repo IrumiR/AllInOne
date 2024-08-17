@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { LOCAL_STORAGE_KEYS } from '@/common/constants';
 
 import CustomerBookings from './CustomerDashboard/CustomerBookings';
+import ServicesProviderBookings from './ServicesProviderDashboard/ServicesProviderBookings';
 
 function AllBookingsPage() {
 
@@ -19,7 +20,7 @@ function AllBookingsPage() {
         <div>
             {
                 localRole === 'service-provider' ? (
-                    <h1>Service Provider bookings</h1>
+                    <ServicesProviderBookings />
                 ) : (
                     <CustomerBookings />
                 )

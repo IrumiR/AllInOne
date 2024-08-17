@@ -5,7 +5,7 @@ import {
     getAllServices,
     getServiceById,
     updateServiceById,
-    getAllServicesByServiceProviderId
+    getAllServicesByServiceProviderId,
 } from "../Controllers/servicesController.js";
 import { allowOnly } from "../auth/verifyToken.js";
 import { authenticate } from "../auth/verifyToken.js";
@@ -44,5 +44,7 @@ router.patch(
     ],
     updateServiceById
 );
+
+
 
 export default router;

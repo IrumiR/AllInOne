@@ -23,7 +23,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-function OrderItemCompoent(props) {
+function DeliveryListItem(props) {
 
     const { itemData, userRole, delivery } = props;
     const [customerInfo, setCustomerInfo] = useState(null);
@@ -33,7 +33,7 @@ function OrderItemCompoent(props) {
 
     const dispatch = useDispatch();
 
-    // console.log("Order Item", itemData);
+    console.log("Order Item", itemData);
 
     const handleChange = async (value) => {
         // console.log("Selected value", value);
@@ -114,20 +114,17 @@ function OrderItemCompoent(props) {
             </TableCell>
 
             {
-                userRole === 'service-provider' && (
+                userRole === 'delivery-person' && (
+
                     <TableCell className="text-right">
-                        <Select onValueChange={handleDeliveryChange} disabled={orderStatus === "dispatched" || itemData?.orderStatus === 'completed'}>
+                        <Select onValueChange={handleChange} defaultValue={itemData?.orderStatus} value={orderStatus} disabled={orderStatus === "dispatched" || itemData?.orderStatus === 'completed'}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Delivery Rider" />
+                                <SelectValue placeholder="Order Status" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectLabel>Select Delivery Person</SelectLabel>
-                                    {
-                                        delivery?.map((person) => (
-                                            <SelectItem key={person._id} value={person._id}>{person.firstName} {person.lastName}</SelectItem>
-                                        ))
-                                    }
+                                    <SelectLabel>Order Status</SelectLabel>
+                                    <SelectItem value="delivered">Delivered</SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
@@ -135,7 +132,7 @@ function OrderItemCompoent(props) {
                 )
             }
 
-            {
+            {/* {
                 userRole === 'service-provider' && (
                     <TableCell className="text-right">
                         <Select onValueChange={handleChange} defaultValue={itemData?.orderStatus} value={orderStatus} disabled={orderStatus === "dispatched" || itemData?.orderStatus === 'completed'}>
@@ -153,7 +150,7 @@ function OrderItemCompoent(props) {
                         </Select>
                     </TableCell>
                 )
-            }
+            } */}
 
 
 
@@ -161,10 +158,10 @@ function OrderItemCompoent(props) {
     )
 }
 
-export default OrderItemCompoent
+export default DeliveryListItem
 
 // props validation
-OrderItemCompoent.propTypes = {
+DeliveryListItem.propTypes = {
     itemData: PropTypes.object.isRequired,
     userRole: PropTypes.string,
     delivery: PropTypes.array

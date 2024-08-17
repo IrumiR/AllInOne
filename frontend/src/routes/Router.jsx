@@ -34,6 +34,7 @@ import ServicesProviderProducts from "@/components/Dashboard/ServicesProviderDas
 import ServicesProviderProductsAddEdit from "@/components/Dashboard/ServicesProviderDashboard/ServicesProviderProductsAddEdit";
 import ServicesProviderOrders from "@/components/Dashboard/ServicesProviderDashboard/ServicesProviderOrders";
 import ServicesProviderBookings from "@/components/Dashboard/ServicesProviderDashboard/ServicesProviderBookings";
+import DeliveryDashboard from "@/pages/DeliveryDashboard/DeliveryDashboard";
 
 import SucessAlert from "@/components/PlaceholderComponents/SucessAlert";
 
@@ -72,6 +73,7 @@ const Router = () => {
       <Route path="/dashboard/services/add" element={<ServicesProviderServiceAddEdit />} />
       <Route path="/dashboard/services/:id" element={<ServicesProviderServiceAddEdit />} />
 
+      <Route path="/delivery-dashboard" element={<DeliveryDashboard />} />
 
     {/* 404 page */}
       <Route path='*' element={<NotFound />} />

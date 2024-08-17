@@ -1,4 +1,9 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
+import { getBookingsByServiceProviderId } from '@/services/booking.service';
+import { setIsLoading } from '@/store/loading.slice';
+import { useDispatch } from 'react-redux';
+import { LOCAL_STORAGE_KEYS } from '@/common/constants';
+import { getUserProfile } from '@/services/auth.service';
 
 import { Routes, Route, Link } from 'react-router-dom';
 import ServicesProviderOrders from './ServicesProviderOrders';
@@ -42,14 +47,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-} from "@/components/ui/pagination"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
     Table,
@@ -59,13 +56,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
-
 
 import {
     Breadcrumb,
@@ -77,8 +67,30 @@ import {
 } from "@/components/ui/breadcrumb"
 
 import ServicesProviderNavbar from './ServicesProviderNavbar';
+import BookingItemComponent from '../MiniComponents/BookingListComponents/BookingItemComponent';
 
 function ServicesProviderBookings() {
+
+    const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+    const userRole = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ROLE);
+    const [bookings, setBookings] = useState([]);
+
+
+    useEffect(() => {
+        const fetchBookings = async (userID) => {
+            try {
+                const response = await getBookingsByServiceProviderId(userID);
+                setBookings(response);
+
+                // console.log(response);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchBookings(userId);
+    }, [userId])
+
     return (
         <section className="mt-20">
             <div className="container">
@@ -193,7 +205,7 @@ function ServicesProviderBookings() {
                             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
                                 <Card x-chunk="dashboard-05-chunk-3">
                                     <CardHeader className="px-7">
-                                        <CardTitle>Your Bokkings for Services</CardTitle>
+                                        <CardTitle>Bookings for Your Services</CardTitle>
                                         <CardDescription>
                                             Recent bookings from your services.
                                         </CardDescription>
@@ -203,179 +215,29 @@ function ServicesProviderBookings() {
                                             <TableHeader>
                                                 <TableRow>
                                                     <TableHead>Customer</TableHead>
-                                                    <TableHead className="hidden sm:table-cell">
-                                                        Type
-                                                    </TableHead>
-                                                    <TableHead className="hidden sm:table-cell">
+                                                    <TableHead className="text-center hidden sm:table-cell">
                                                         Status
                                                     </TableHead>
                                                     <TableHead className="hidden md:table-cell">
                                                         Date
                                                     </TableHead>
-                                                    <TableHead className="text-right">Amount</TableHead>
+                                                    <TableHead className="text-left">Amount</TableHead>
+                                                    {/* {
+                                                        userRole === 'service-provider' && (
+                                                            <TableHead className="text-left">Action</TableHead>
+                                                        )
+                                                    } */}
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                <TableRow className="bg-accent">
-                                                    <TableCell>
-                                                        <div className="font-medium">Liam Johnson</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            liam@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Sale
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="secondary">
-                                                            Fulfilled
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-23
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$250.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Olivia Smith</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            olivia@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Refund
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="outline">
-                                                            Declined
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-24
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$150.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Noah Williams</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            noah@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Subscription
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="secondary">
-                                                            Fulfilled
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-25
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$350.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Emma Brown</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            emma@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Sale
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="secondary">
-                                                            Fulfilled
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-26
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$450.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Liam Johnson</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            liam@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Sale
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="secondary">
-                                                            Fulfilled
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-23
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$250.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Liam Johnson</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            liam@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Sale
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="secondary">
-                                                            Fulfilled
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-23
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$250.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Olivia Smith</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            olivia@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Refund
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="outline">
-                                                            Declined
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-24
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$150.00</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        <div className="font-medium">Emma Brown</div>
-                                                        <div className="hidden text-sm text-muted-foreground md:inline">
-                                                            emma@example.com
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        Sale
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        <Badge className="text-xs" variant="secondary">
-                                                            Fulfilled
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        2023-06-26
-                                                    </TableCell>
-                                                    <TableCell className="text-right">$450.00</TableCell>
-                                                </TableRow>
+                                               {/* <BookingItemComponent /> */}
+                                               {
+                                                bookings.length > 0 && bookings.map((booking, index) => {
+                                                    return (
+                                                        <BookingItemComponent userRole={userRole} key={index} itemData={booking} />
+                                                    )
+                                                })
+                                               }
                                             </TableBody>
                                         </Table>
                                     </CardContent>

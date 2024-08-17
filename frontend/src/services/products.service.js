@@ -66,4 +66,15 @@ const getAllProducts = async () => {
     }
 }
 
-export { createProduct, getProductById, updateProductById, deleteProductById, getAllProducts };
+// get poducts by service provider ID
+const getProductsByServiceProviderId = async (serviceProviderId) => {
+    try {
+        const response = await httpGet(`/products/products-by-provider/${serviceProviderId}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
+
+export { createProduct, getProductById, updateProductById, deleteProductById, getAllProducts, getProductsByServiceProviderId };

@@ -112,7 +112,8 @@ const updateBookingById = async (req, res) => {
 
         res.status(200).json({
             type: 'success',
-            booking: updatedBooking,
+            message: 'Booking updated successfully',
+            data: updatedBooking,
         });
     } catch (error) {
         res.status(500).json({
@@ -151,7 +152,7 @@ const getBookingsByServiceProviderId = async (req, res) => {
     try {
         const bookings = await Booking.find({ serviceProviderId })
             .populate('clientId', 'name email') // Populate user details if needed
-            .populate('serviceProviderId', 'businessName') // Populate service provider details if needed
+            // .populate('serviceProviderId', 'businessName') // Populate service provider details if needed
             .exec();
 
         if (!bookings || bookings.length === 0) {
@@ -165,4 +166,4 @@ const getBookingsByServiceProviderId = async (req, res) => {
     }
 };
 
-export { createBooking, getBookingById, updateBookingById, getBookingsByUserId };
+export { createBooking, getBookingById, updateBookingById, getBookingsByUserId, getBookingsByServiceProviderId };

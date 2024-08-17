@@ -23,7 +23,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-function OrderItemCompoent(props) {
+function DeliveryListItem(props) {
 
     const { itemData, userRole, delivery } = props;
     const [customerInfo, setCustomerInfo] = useState(null);
@@ -161,10 +161,10 @@ function OrderItemCompoent(props) {
     )
 }
 
-export default OrderItemCompoent
+export default DeliveryListItem
 
 // props validation
-OrderItemCompoent.propTypes = {
+DeliveryListItem.propTypes = {
     itemData: PropTypes.object.isRequired,
     userRole: PropTypes.string,
     delivery: PropTypes.array

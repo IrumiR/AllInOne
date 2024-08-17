@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { LOCAL_STORAGE_KEYS } from '@/common/constants'
 import { getBookingsByUserId } from '@/services/booking.service'
+import { setIsLoading } from '@/store/loading.slice'
 
 import { Link } from 'react-router-dom'
 import {
@@ -53,19 +54,24 @@ function CustomerBookings() {
 
     const [bookings, setBookings] = useState([]);
     const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+    const userRole = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ROLE);
+    const dispatch = useDispatch();
 
-    console.log('userId', userId);
+    // console.log('userId', userId);
 
     // get order by user id
 
     useEffect(() => {
         const fetchBookings = async () => {
             try {
+                dispatch(setIsLoading(true));
                 const response = await getBookingsByUserId(userId);
                 console.log('response', response);
                 setBookings(response);
             } catch (error) {
                 console.error("Failed to fetch bookings", error);
+            } finally{
+                dispatch(setIsLoading(false));
             }
         }
 
@@ -212,24 +218,24 @@ function CustomerBookings() {
                                                                 {/* <TableHead className="hidden sm:table-cell">
                                                     Type
                                                 </TableHead> */}
-                                                                <TableHead className="hidden sm:table-cell">
+                                                                <TableHead className="text-center hidden sm:table-cell">
                                                                     Status
                                                                 </TableHead>
                                                                 <TableHead className="hidden md:table-cell">
                                                                     Date
                                                                 </TableHead>
-                                                                <TableHead className="text-right">Amount</TableHead>
-                                                                {/* <TableHead className="hidden sm:table-cell">
-                                                            Action
-                                                        </TableHead> */}
+                                                                <TableHead className="text-left">Amount</TableHead>
+                                                                <TableHead className="hidden sm:table-cell">
+                                                                    Action
+                                                                </TableHead>
                                                             </TableRow>
                                                         </TableHeader>
                                                         <TableBody>
                                                             {
-                                                        bookings.map((booking) => (
-                                                            <BookingItemComponent key={booking._id} itemData={booking} />
-                                                        ))
-                                                    }
+                                                                bookings.map((booking) => (
+                                                                    <BookingItemComponent userRole={userRole} key={booking._id} itemData={booking} />
+                                                                ))
+                                                            }
                                                         </TableBody>
                                                     </Table>
                                                 </CardContent>

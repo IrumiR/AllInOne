@@ -57,7 +57,16 @@ const getAllServices = async () => {
 }
 
 
-// update services provider busines profile
+// get services by provider ID
+const getServicesByServiceProviderId = async (serviceProviderId) => {
+    try {
+        const response = await httpGet(`/services/service-by-provider/${serviceProviderId}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        throw error?.response?.data;
+    }
+}
 
 
-export { createService, getServiceById, updateServiceById, getAllServices, deleteServiceById };
+export { createService, getServiceById, updateServiceById, getAllServices, deleteServiceById, getServicesByServiceProviderId };
