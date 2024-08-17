@@ -6,6 +6,7 @@ import {
     getServiceById,
     updateServiceById,
     getAllServicesByServiceProviderId,
+    getFilteredServices,
 } from "../Controllers/servicesController.js";
 import { allowOnly } from "../auth/verifyToken.js";
 import { authenticate } from "../auth/verifyToken.js";
@@ -14,6 +15,7 @@ import { userRoles } from "../constants/userRoles.constants.js";
 
 const router = express.Router();
 
+router.get('/getfiltered', getFilteredServices);
 router.get('/',getAllServices);
 router.get('/:id',getServiceById);
 router.patch('/remove/:id', authenticate, allowOnly(['service-provider', 'super-admin']), deleteServiceById);
@@ -44,6 +46,8 @@ router.patch(
     ],
     updateServiceById
 );
+
+
 
 
 

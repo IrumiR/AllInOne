@@ -80,7 +80,7 @@ function ProductsSinglePage() {
                 <div className="max-w-[1200px] grid md:grid-cols-2 gap-6 lg:gap-12 items-start px-4 mx-auto py-6">
                     <div className="grid gap-4 md:gap-10 items-start">
                         <img
-                            src="https://images.unsplash.com/photo-1714479124820-8aaa9c7722af?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            src={product?.image}
                             alt="Product Image"
                             width={600}
                             height={600}

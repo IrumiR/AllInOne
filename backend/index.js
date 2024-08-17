@@ -7,6 +7,7 @@ import connectDB from "./config/db.js";
 import cloudinary from "cloudinary";
 import { cloudinaryConfig } from "./config/cloudinary.config.js";
 import Stripe from "stripe";
+import nodemailer from "nodemailer";
 
 // rountes
 import authRoute from "./Routes/auth.js";
@@ -24,6 +25,18 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 8000
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    // secure: false, // Use `true` for port 465, `false` for all other ports
+    auth: {
+      user: "mailbox.pasindu@gmail.com",
+      pass: process.env.BVREVO_PASSD,
+    },
+  });
+
+
 
 const corsOptions = {
     origin: true,
@@ -175,6 +188,30 @@ app.get('/api/v1/payment-success', async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/v1/send-email', async (req, res) => {
+    const { to, subject, text, html } = req.body;
+
+    if (!to || !subject || (!text && !html)) {
+        return res.status(400).json({ message: 'Please provide all required fields: to, subject, and text or html' });
+    }
+
+    const mailOptions = {
+        from: process.env.SERVICE_PROVIDER_EMAIL, // Sender address
+        to,                      // List of recipients
+        subject,                 // Subject line
+        text,                    // Plain text body
+        html,                    // HTML body
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        res.status(200).json({ message: 'Email sent successfully', info });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ message: 'Failed to send email', error });
     }
 });
 

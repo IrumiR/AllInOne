@@ -182,3 +182,39 @@ export const getAllServicesByServiceProviderId = async(req, res)=>{
         return res.status(400).json({ type: 'error', message: 'Servcies Retring Error', errors: [{ msg: error }] });
     }
 }
+
+
+// fitered search
+export const getFilteredServices = async (req, res) => {
+    const { searchTerm } = req.query;
+
+    try {
+        let services;
+
+        // If there's no search term, return all services
+        if (!searchTerm || searchTerm.trim() === '') {
+            services = await Service.find();
+        } else {
+            // Create a case-insensitive regex to search for the term in title, description, or category
+            const regex = new RegExp(searchTerm, 'i');
+
+            // Find services that match the search term
+            services = await Service.find({
+                $or: [
+                    { title: regex },
+                    { description: regex },
+                    { category: regex },
+                ]
+            });
+        }
+
+        if (!services || services.length === 0) {
+            return res.status(404).json({ message: 'No services found matching the search criteria.' });
+        }
+
+        res.status(200).json(services);
+    } catch (error) {
+        console.error('Error fetching filtered services:', error);
+        res.status(500).json({ message: 'Server error while fetching services.' });
+    }
+};

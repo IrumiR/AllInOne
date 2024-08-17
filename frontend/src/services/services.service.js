@@ -68,5 +68,17 @@ const getServicesByServiceProviderId = async (serviceProviderId) => {
     }
 }
 
+const getFilteredServices = async (searchTerm = "", category = "") => {
+    try {
+        const response = await httpGet(`/services/getfiltered?searchTerm=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(category)}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        console.error('Error fetching filtered services:', error);
+        throw error?.response?.data || 'An unexpected error occurred';
+    }
+}
 
-export { createService, getServiceById, updateServiceById, getAllServices, deleteServiceById, getServicesByServiceProviderId };
+
+
+export { createService, getServiceById, updateServiceById, getAllServices, deleteServiceById, getServicesByServiceProviderId, getFilteredServices };
